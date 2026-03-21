@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PVV — Viral Growth Intelligence</title>
+<meta name="description" content="Viral content strategy system for Prestige Valley Visuals. Generate AI-powered content plans that convert viewers into inbound clients.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #07090d;
+  --surface: #0c0f15;
+  --surface2: #11151d;
+  --border: #1a2030;
+  --border2: #232d40;
+  --accent: #d4f53c;
+  --accent-dim: rgba(212,245,60,0.08);
+  --green: #2ecc8a;
+  --green-dim: rgba(46,204,138,0.08);
+  --red: #ff4d4d;
+  --red-dim: rgba(255,77,77,0.08);
+  --orange: #ff8c3a;
+  --text: #dde2ee;
+  --muted: #4a5568;
+  --muted2: #2d3748;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* GRID BG */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(212,245,60,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,245,60,0.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* NAV */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(7,9,13,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.nav-logo span { color: var(--muted); font-weight: 400; }
+.nav-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+.pulse-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2.2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+/* HERO */
+.hero {
+  position: relative;
+  z-index: 1;
+  padding: 80px 32px 64px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(212,245,60,0.2);
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 28px;
+  letter-spacing: 0.08em;
+}
+.hero h1 {
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+.hero-sub {
+  font-size: 17px;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 560px;
+  margin-bottom: 40px;
+  font-weight: 400;
+}
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: var(--accent);
+  color: #000;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.hero-cta:hover { background: #e8ff60; transform: translateY(-1px); }
+
+/* MAIN CONTAINER */
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* SECTION LABEL */
+.slabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.slabel::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.slabel span { color: var(--accent); }
+
+/* PLATFORM TABS */
+.platform-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.plat-btn {
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+.plat-btn:hover { border-color: var(--border2); color: var(--text); }
+.plat-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+/* CONTROL PANEL */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+@media(max-width:600px){ .grid2 { grid-template-columns: 1fr; } }
+
+.field label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+.field textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
+select option { background: var(--surface2); }
+
+/* RUN BUTTON */
+.run-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--accent);
+  color: #000;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.run-btn:hover:not(:disabled) { background: #e8ff60; }
+.run-btn:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(0,0,0,0.3);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: none;
+}
+.run-btn.loading .spinner { display: block; }
+
+/* ERROR */
+.error-box {
+  background: var(--red-dim);
+  border: 1px solid rgba(255,77,77,0.25);
+  border-radius: 6px;
+  padding: 14px 18px;
+  color: var(--red);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+/* METRICS */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+@media(max-width:600px){ .metrics-grid { grid-template-columns: 1fr 1fr; } }
+.metric {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 16px;
+  text-align: center;
+}
+.metric-val {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--accent);
+  margin-bottom: 5px;
+}
+.metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+
+/* SCHEDULE */
+.sched-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
+}
+@media(max-width:600px){ .sched-row { grid-template-columns: 1fr; } }
+.sched-day {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 14px;
+}
+.sched-day.today { border-color: var(--accent); }
+.sched-day-name {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+.sched-day.today .sched-day-name { color: var(--accent); }
+.sched-day-task { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+/* CONTENT CARDS */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.card.open { border-color: var(--border2); }
+.card-head {
+  display: flex;
+  align-items: center;
+  padding: 18px 22px;
+  cursor: pointer;
+  user-select: none;
+  gap: 12px;
+}
+.card-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  flex-shrink: 0;
+  width: 20px;
+}
+.card-title { font-size: 15px; font-weight: 700; color: var(--text); flex: 1; line-height: 1.35; }
+.card-tags { display: flex; gap: 7px; align-items: center; flex-shrink: 0; }
+.tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.tag-green { background: var(--green-dim); color: var(--green); }
+.tag-accent { background: var(--accent-dim); color: var(--accent); }
+.tag-red { background: var(--red-dim); color: var(--red); }
+.tag-orange { background: rgba(255,140,58,0.1); color: var(--orange); }
+.chevron {
+  font-size: 11px;
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+.card.open .chevron { transform: rotate(180deg); }
+.card-body { display: none; padding: 22px; border-top: 1px solid var(--border); }
+.card.open .card-body { display: block; }
+
+/* CARD BLOCKS */
+.cblock { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.cblock:last-of-type { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.cblock-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 9px;
+}
+.hook-box {
+  background: var(--surface2);
+  border-left: 3px solid var(--accent);
+  padding: 13px 17px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--accent);
+  border-radius: 0 5px 5px 0;
+  line-height: 1.55;
+}
+.step-list { display: flex; flex-direction: column; gap: 10px; }
+.step-item { display: flex; gap: 12px; align-items: flex-start; font-size: 13px; color: var(--text); line-height: 1.6; }
+.step-n {
+  width: 22px; height: 22px;
+  background: var(--accent);
+  color: #000;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.why-box {
+  background: var(--green-dim);
+  border: 1px solid rgba(46,204,138,0.15);
+  padding: 13px 17px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.65;
+}
+.body-text { font-size: 13px; color: var(--text); line-height: 1.6; }
+
+/* SAVE BTN */
+.save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 14px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.save-btn:hover { border-color: var(--green); color: var(--green); }
+
+/* SAVED IDEAS */
+.saved-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.saved-title { flex: 1; font-size: 13px; color: var(--text); }
+.del-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 15px; padding-left: 8px; transition: color 0.15s; }
+.del-btn:hover { color: var(--red); }
+
+/* EXPORT BTN */
+.export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 20px;
+}
+.export-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* PATTERN BULLETS */
+.pattern-row { display: flex; flex-direction: column; gap: 9px; }
+.pattern-item { display: flex; gap: 10px; font-size: 13px; color: var(--text); line-height: 1.5; align-items: flex-start; }
+.p-icon { color: var(--orange); flex-shrink: 0; margin-top: 2px; font-size: 13px; }
+
+/* FOOTER */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-logo { font-size: 13px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); }
+.footer-copy { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+
+/* ANIMATION */
+@keyframes fadein { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.fadein { animation: fadein 0.4s ease forwards; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">PVV <span>/ Viral Growth Intel</span></div>
+  <div class="nav-status"><span class="pulse-dot"></span> System Live</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">⚡ Prestige Valley Visuals</div>
+  <h1>Turn Content Into<br><em>Inbound Clients</em></h1>
+  <p class="hero-sub">AI-powered viral content strategy. Real patterns. Immediate execution plans. Built to convert viewers into paying real estate clients.</p>
+  <a href="#generator" class="hero-cta">▶ Launch Generator</a>
+</div>
+
+<!-- MAIN APP -->
+<div class="container" id="generator">
+
+  <!-- PLATFORM -->
+  <div class="slabel">Select Platform</div>
+  <div class="platform-row" id="platRow"></div>
+
+  <!-- INPUT PANEL -->
+  <div class="panel">
+    <div class="slabel">Parameters</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Niche</label>
+        <input type="text" id="niche" value="Real estate videography / visual media">
+      </div>
+      <div class="field">
+        <label>Content Goal</label>
+        <select id="goal">
+          <option value="inbound clients">Inbound Clients</option>
+          <option value="authority positioning">Authority Positioning</option>
+          <option value="lead generation">Lead Generation</option>
+          <option value="brand awareness">Brand Awareness</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Target Audience</label>
+        <input type="text" id="audience" value="Real estate agents, brokers, developers in RGV/TX">
+      </div>
+      <div class="field">
+        <label>Ideas to Generate</label>
+        <select id="count">
+          <option value="3">3 Ideas</option>
+          <option value="5" selected>5 Ideas</option>
+          <option value="7">7 Ideas</option>
+        </select>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:18px">
+      <label>Context</label>
+      <textarea id="ctx">We specialize in luxury real estate video production in the Rio Grande Valley. Services: listing videos, agent brand content, drone footage, property walkthroughs. Goal: attract high-ticket real estate clients and position as the premium option in the market.</textarea>
+    </div>
+    <button class="run-btn" id="runBtn" onclick="runSystem()">
+      <span class="spinner" id="spinner"></span>
+      <span id="btnLabel">▶ Generate Viral Content Plan</span>
+    </button>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-box" id="errBox" style="display:none"></div>
+
+  <!-- RESULTS -->
+  <div id="results" style="display:none"></div>
+
+  <!-- SAVED -->
+  <div id="savedWrap" style="display:none">
+    <div class="slabel">Saved Ideas</div>
+    <div id="savedList"></div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">PVV</div>
+  <div class="footer-copy">Prestige Valley Visuals © 2025</div>
+</footer>
+
+<script>
+const PLATFORMS = ['Instagram Reels','TikTok','YouTube Shorts','LinkedIn'];
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+const LOAD_MSGS = [
+  'Scanning viral patterns...',
+  'Identifying high-performing hooks...',
+  'Analyzing audience psychology...',
+  'Extracting content frameworks...',
+  'Building execution plans...',
+  'Mapping conversion triggers...'
+];
+let activePlat = 'Instagram Reels';
+let openCards = {};
+let currentData = null;
+let saved = [];
+try { saved = JSON.parse(localStorage.getItem('pvv_saved') || '[]'); } catch {}
+
+const todayName = DAYS[new Date().getDay() - 1] || null;
+
+// Init platforms
+function initPlatforms() {
+  document.getElementById('platRow').innerHTML = PLATFORMS.map(p =>
+    `<button class="plat-btn${p === activePlat ? ' active' : ''}" onclick="selectPlat(this,'${p}')">${p}</button>`
+  ).join('');
+}
+
+function selectPlat(btn, p) {
+  activePlat = p;
+  document.querySelectorAll('.plat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// Loading state
+let _loadIv;
+function setLoading(on) {
+  const btn = document.getElementById('runBtn');
+  const sp = document.getElementById('spinner');
+  const lbl = document.getElementById('btnLabel');
+  btn.disabled = on;
+  sp.style.display = on ? 'block' : 'none';
+  if (on) {
+    btn.classList.add('loading');
+    let i = 0;
+    lbl.textContent = LOAD_MSGS[0];
+    _loadIv = setInterval(() => { i++; lbl.textContent = LOAD_MSGS[i % LOAD_MSGS.length]; }, 1800);
+  } else {
+    btn.classList.remove('loading');
+    clearInterval(_loadIv);
+    lbl.textContent = '▶ Generate Viral Content Plan';
+  }
+}
+
+// Main runner
+async function runSystem() {
+  const niche = document.getElementById('niche').value.trim();
+  const audience = document.getElementById('audience').value.trim();
+  if (!niche || !audience) { alert('Fill in Niche and Audience.'); return; }
+
+  setLoading(true);
+  document.getElementById('errBox').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+
+  const goal = document.getElementById('goal').value;
+  const count = document.getElementById('count').value;
+  const ctx = document.getElementById('ctx').value.trim();
+
+  const prompt = `You are a viral content strategy system for Prestige Valley Visuals (PVV), a premium real estate video production company.
+
+Platform: ${activePlat}
+Niche: ${niche}
+Goal: ${goal}
+Target Audience: ${audience}
+Count: ${count} content ideas
+Context: ${ctx}
+
+Return ONLY valid JSON. No markdown fences, no explanation, no preamble. Raw JSON only:
+
+{
+  "patterns": {
+    "dominant_formats": ["f1","f2","f3"],
+    "avg_hook_length": "X seconds",
+    "top_emotional_trigger": "name",
+    "best_posting_days": ["Day1","Day2"],
+    "engagement_pattern": "one sentence description of what drives engagement on this platform for this niche"
+  },
+  "ideas": [
+    {
+      "id": 1,
+      "title": "Specific compelling title",
+      "format": "format type (e.g. POV, Before/After, Hot Take, Day in the Life)",
+      "hook": "The exact first line spoken or text on screen — first 3 seconds only",
+      "emotional_trigger": "curiosity OR status OR FOMO OR social proof OR aspiration",
+      "structure": ["step 1","step 2","step 3","step 4","step 5"],
+      "cta": "The exact call to action at the end",
+      "why_it_performs": "2-3 sentences explaining the specific proven pattern that makes this drive inbound clients",
+      "fire_factor": "HIGH or MEDIUM"
+    }
+  ],
+  "weekly_schedule": {
+    "Monday": "specific content task",
+    "Tuesday": "specific content task",
+    "Wednesday": "specific content task",
+    "Thursday": "specific content task",
+    "Friday": "specific content task"
+  }
+}
+
+Rules:
+- Every idea must be executable with a smartphone and existing footage only
+- Every hook must be specific, not generic
+- Every idea must directly attract paying real estate clients
+- No theory, no filler`;
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = data.content[0].text.trim().replace(/```json|```/g, '').trim();
+    currentData = JSON.parse(raw);
+    renderResults(currentData);
+    setLoading(false);
+  } catch (e) {
+    setLoading(false);
+    const eb = document.getElementById('errBox');
+    eb.textContent = 'Error: ' + e.message;
+    eb.style.display = 'block';
+  }
+}
+
+// Render
+function renderResults(data) {
+  openCards = {};
+  const el = document.getElementById('results');
+
+  const formats = (data.patterns.dominant_formats || []).join(', ');
+  const bestDays = (data.patterns.best_posting_days || []).join(' / ');
+
+  const metricsHTML = [
+    { v: data.ideas.length, l: 'Ideas' },
+    { v: data.patterns.avg_hook_length || '—', l: 'Hook Window' },
+    { v: data.patterns.top_emotional_trigger || '—', l: 'Top Trigger' },
+    { v: bestDays || '—', l: 'Best Days' }
+  ].map(m => `<div class="metric"><span class="metric-val">${m.v}</span><span class="metric-label">${m.l}</span></div>`).join('');
+
+  const schedHTML = DAYS.map(d => `
+    <div class="sched-day${d === todayName ? ' today' : ''}">
+      <div class="sched-day-name">${d}${d === todayName ? ' — Today' : ''}</div>
+      <div class="sched-day-task">${data.weekly_schedule?.[d] || '—'}</div>
+    </div>`).join('');
+
+  const cardsHTML = data.ideas.map((idea, i) => `
+    <div class="card" id="card_${i}">
+      <div class="card-head" onclick="toggleCard(${i})">
+        <div class="card-num">0${i+1}</div>
+        <div class="card-title">${escHtml(idea.title)}</div>
+        <div class="card-tags">
+          <span class="tag tag-accent">${escHtml(activePlat)}</span>
+          <span class="tag tag-green">${escHtml(idea.format)}</span>
+          ${idea.fire_factor === 'HIGH' ? '<span class="tag tag-red">🔥 High</span>' : ''}
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="card-body">
+        <div class="cblock">
+          <div class="cblock-label">Hook — First 3 Seconds</div>
+          <div class="hook-box">${escHtml(idea.hook)}</div>
+        </div>
+        <div class="cblock">
+          <div class="cblock-label">Step-by-Step Structure</div>
+          <div class="step-list">${(idea.structure || []).map((s, j) => `
+            <div class="step-item">
+              <span class="step-n">${j+1}</span>
+              <span>${escHtml(s)}</span>
+            </div>`).join('')}
+          </div>
+        </div>
+        <div class="cblock">
+          <div class="cblock-label">Emotional Trigger</div>
+          <div class="body-text">${escHtml(idea.emotional_trigger)}</div>
+        </div>
+        <div class="cblock">
+          <div class="cblock-label">Call to Action</div>
+          <div class="body-text">${escHtml(idea.cta)}</div>
+        </div>
+        <div class="cblock">
+          <div class="cblock-label">Why It Performs</div>
+          <div class="why-box">${escHtml(idea.why_it_performs)}</div>
+        </div>
+        <button class="save-btn" onclick="saveIdea(${i})">+ Save Idea</button>
+      </div>
+    </div>`).join('');
+
+  el.innerHTML = `
+    <div class="slabel">Pattern Analysis <span>— ${escHtml(activePlat)}</span></div>
+    <div class="panel" style="margin-bottom:24px">
+      <div class="metrics-grid">${metricsHTML}</div>
+      <div class="pattern-row">
+        <div class="pattern-item"><span class="p-icon">›</span><span><strong>Formats:</strong> ${escHtml(formats)}</span></div>
+        <div class="pattern-item"><span class="p-icon">›</span><span><strong>Engagement:</strong> ${escHtml(data.patterns.engagement_pattern)}</span></div>
+      </div>
+    </div>
+    <div class="slabel">Weekly Execution Schedule</div>
+    <div class="sched-row">${schedHTML}</div>
+    <div class="slabel">Content Execution Plans</div>
+    <button class="export-btn" onclick="exportAll()">↓ Export All Plans</button>
+    <div id="cardList">${cardsHTML}</div>
+  `;
+
+  el.className = 'fadein';
+  el.style.display = 'block';
+  renderSaved();
+}
+
+function toggleCard(i) {
+  const c = document.getElementById('card_' + i);
+  if (c) c.classList.toggle('open');
+}
+
+function saveIdea(i) {
+  if (!currentData) return;
+  const idea = currentData.ideas[i];
+  if (saved.find(s => s.title === idea.title)) { alert('Already saved.'); return; }
+  saved.push({ title: idea.title, platform: activePlat, format: idea.format, hook: idea.hook });
+  try { localStorage.setItem('pvv_saved', JSON.stringify(saved)); } catch {}
+  renderSaved();
+}
+
+function deleteIdea(i) {
+  saved.splice(i, 1);
+  try { localStorage.setItem('pvv_saved', JSON.stringify(saved)); } catch {}
+  renderSaved();
+}
+
+function renderSaved() {
+  const wrap = document.getElementById('savedWrap');
+  const list = document.getElementById('savedList');
+  if (!saved.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  list.innerHTML = saved.map((s, i) => `
+    <div class="saved-item">
+      <span class="saved-title">${escHtml(s.title)}</span>
+      <span class="tag tag-accent">${escHtml(s.platform)}</span>
+      <span class="tag tag-green">${escHtml(s.format)}</span>
+      <button class="del-btn" onclick="deleteIdea(${i})">✕</button>
+    </div>`).join('');
+}
+
+function exportAll() {
+  if (!currentData) return;
+  let txt = `PVV VIRAL CONTENT PLAN\nPlatform: ${activePlat}\nGenerated: ${new Date().toLocaleDateString()}\n\n`;
+  txt += `=== PATTERN ANALYSIS ===\n`;
+  txt += `Formats: ${(currentData.patterns.dominant_formats || []).join(', ')}\n`;
+  txt += `Hook Window: ${currentData.patterns.avg_hook_length}\n`;
+  txt += `Top Trigger: ${currentData.patterns.top_emotional_trigger}\n`;
+  txt += `Best Days: ${(currentData.patterns.best_posting_days || []).join(', ')}\n`;
+  txt += `Engagement: ${currentData.patterns.engagement_pattern}\n\n`;
+  txt += `=== WEEKLY SCHEDULE ===\n`;
+  ['Monday','Tuesday','Wednesday','Thursday','Friday'].forEach(d => {
+    txt += `${d}: ${currentData.weekly_schedule?.[d] || '—'}\n`;
+  });
+  txt += `\n=== CONTENT IDEAS ===\n`;
+  currentData.ideas.forEach((idea, i) => {
+    txt += `\n--- IDEA ${i+1}: ${idea.title} ---\n`;
+    txt += `Format: ${idea.format}\n`;
+    txt += `Fire Factor: ${idea.fire_factor}\n`;
+    txt += `Hook: ${idea.hook}\n`;
+    txt += `Emotional Trigger: ${idea.emotional_trigger}\n`;
+    txt += `Structure:\n${idea.structure.map((s,j)=>`  ${j+1}. ${s}`).join('\n')}\n`;
+    txt += `CTA: ${idea.cta}\n`;
+    txt += `Why It Performs: ${idea.why_it_performs}\n`;
+  });
+  const blob = new Blob([txt], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `pvv-content-plan-${Date.now()}.txt`;
+  a.click();
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+initPlatforms();
+renderSaved();
+</script>
+</body>
+</html>
