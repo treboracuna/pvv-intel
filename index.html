@@ -1223,7 +1223,7 @@ function scheduleAll() {
     const dayName = orderedDays[i % 5];
     const dayData = dates.find(d => d.day === dayName) || dates[i % 5];
     if (!calState[dayData.iso]) calState[dayData.iso] = [];
-    calState[dayData.iso].push({ title: idea.title, format: idea.format, viral_score: idea.viral_score, hook: idea.hook, posted: false });
+    calState[dayData.iso].push({ title: idea.title, format: idea.format, viral_score: idea.viral_score, hook: idea.hook, best_post_time: idea.best_post_time || null, posted: false });
   });
   try { localStorage.setItem('pvv_calendar', JSON.stringify(calState)); } catch {}
   renderCalendar();
@@ -1259,6 +1259,7 @@ function renderCalendar() {
             <span class="tag tag-green" style="font-size:9px">${escHtml(idea.format||'')}</span>
             ${idea.viral_score ? `<span class="cal-idea-score" style="color:${idea.viral_score>=80?'#2ecc8a':idea.viral_score>=60?'#d4f53c':'#ff8c3a'}">⚡${idea.viral_score}</span>` : ''}
           </div>
+          ${idea.best_post_time ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#d4f53c;margin-bottom:4px">🕐 ${escHtml(idea.best_post_time)}</div>` : ''}
           <button class="cal-post-btn${idea.posted?' done':''}" onclick="markPosted('${d.iso}',${idx})">
             ${idea.posted ? '✓ Posted' : 'Mark as Posted'}
           </button>
