@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -17,80 +17,72 @@
 body {
   background: var(--bg); color: var(--text);
   font-family: "Syne", sans-serif;
-  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px;
 }
 body::before {
   content: ""; position: fixed; inset: 0;
   background-image: linear-gradient(rgba(212,245,60,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(212,245,60,0.025) 1px, transparent 1px);
   background-size: 44px 44px; pointer-events: none; z-index: 0;
 }
-.login-wrap {
-  position: relative; z-index: 1;
-  width: 100%; max-width: 420px; padding: 20px;
-}
-.login-logo {
-  text-align: center; margin-bottom: 40px;
-}
-.login-logo-text {
-  font-size: 20px; font-weight: 800; letter-spacing: 0.2em;
-  text-transform: uppercase; color: var(--accent);
-}
-.login-logo-sub {
-  font-size: 11px; color: var(--muted); letter-spacing: 0.1em;
-  text-transform: uppercase; margin-top: 6px;
-  font-family: "IBM Plex Mono", monospace;
-}
-.login-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 36px;
-}
-.login-title {
-  font-size: 18px; font-weight: 700; color: var(--text);
-  margin-bottom: 6px;
-}
-.login-sub {
-  font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.5;
-}
+.login-wrap { position: relative; z-index: 1; width: 100%; max-width: 420px; padding: 20px; }
+.login-logo { text-align: center; margin-bottom: 40px; }
+.login-logo-text { font-size: 20px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); }
+.login-logo-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 6px; font-family: "IBM Plex Mono", monospace; }
+.login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 36px; }
+.login-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.login-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
 .field { margin-bottom: 16px; }
-.field label {
-  display: block; font-size: 10px; font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 7px;
-}
+.field label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+.pw-wrap { position: relative; }
 .field input {
   width: 100%; background: var(--surface2); border: 1px solid var(--border);
   color: var(--text); font-family: "IBM Plex Mono", monospace; font-size: 14px;
-  padding: 12px 16px; border-radius: 6px; outline: none; transition: border-color 0.15s;
+  padding: 12px 44px 12px 16px; border-radius: 6px; outline: none; transition: border-color 0.15s;
 }
 .field input:focus { border-color: var(--accent); }
+.pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 16px; color: var(--muted); padding: 0; transition: color 0.15s; }
+.pw-toggle:hover { color: var(--accent); }
 .login-btn {
   width: 100%; padding: 14px; background: var(--accent); color: #000;
   font-family: "Syne", sans-serif; font-size: 13px; font-weight: 800;
   letter-spacing: 0.1em; text-transform: uppercase; border: none;
   border-radius: 6px; cursor: pointer; transition: all 0.15s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  margin-top: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px;
 }
 .login-btn:hover:not(:disabled) { background: #e8ff60; }
 .login-btn:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.spinner {
-  width: 13px; height: 13px; border: 2px solid rgba(0,0,0,0.3);
-  border-top-color: #000; border-radius: 50%;
-  animation: spin 0.6s linear infinite; display: inline-block;
-}
-.error-msg {
-  background: var(--red-dim); border: 1px solid rgba(255,77,77,0.25);
-  border-radius: 6px; padding: 12px 16px; color: var(--red);
-  font-size: 13px; margin-bottom: 16px; font-family: "IBM Plex Mono", monospace;
-  display: none;
-}
-.lock-icon {
-  width: 48px; height: 48px; background: var(--accent-dim);
-  border: 1px solid rgba(212,245,60,0.2); border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; margin: 0 auto 20px;
-}
+.spinner { width: 13px; height: 13px; border: 2px solid rgba(0,0,0,0.3); border-top-color: #000; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
+.error-msg { background: var(--red-dim); border: 1px solid rgba(255,77,77,0.25); border-radius: 6px; padding: 12px 16px; color: var(--red); font-size: 13px; margin-bottom: 16px; font-family: "IBM Plex Mono", monospace; display: none; }
+.lock-icon { width: 48px; height: 48px; background: var(--accent-dim); border: 1px solid rgba(212,245,60,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 20px; }
+
+/* TEAM PANEL */
+.team-wrap { position: relative; z-index: 1; width: 100%; max-width: 420px; padding: 0 20px 20px; }
+.team-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+.team-title { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.team-title span { color: var(--accent); }
+.member-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.member-row:last-of-type { border-bottom: none; }
+.member-avatar { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-dim); border: 1px solid rgba(212,245,60,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--accent); flex-shrink: 0; }
+.member-info { flex: 1; }
+.member-email { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--text); }
+.member-status { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.member-status.confirmed { color: var(--green); }
+.member-status.pending { color: var(--orange, #ff8c3a); }
+.member-actions { display: flex; gap: 6px; }
+.member-btn { padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; font-family: "Syne", sans-serif; }
+.btn-invite { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.btn-invite:hover { border-color: var(--accent); color: var(--accent); }
+.btn-remove { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.btn-remove:hover { border-color: var(--red); color: var(--red); }
+.add-member-row { display: flex; gap: 8px; margin-top: 14px; }
+.add-member-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: "IBM Plex Mono", monospace; font-size: 12px; padding: 8px 12px; border-radius: 5px; outline: none; transition: border-color 0.15s; }
+.add-member-input:focus { border-color: var(--accent); }
+.btn-add { padding: 8px 14px; background: var(--accent); color: #000; border: none; border-radius: 5px; font-family: "Syne", sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.btn-add:hover { background: #e8ff60; }
+.team-msg { font-size: 11px; font-family: "IBM Plex Mono", monospace; margin-top: 10px; display: none; }
+.team-msg.success { color: var(--green); }
+.team-msg.error { color: var(--red); }
 </style>
 </head>
 <body>
@@ -110,7 +102,10 @@ body::before {
     </div>
     <div class="field">
       <label>Password</label>
-      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      <div class="pw-wrap">
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+        <button type="button" class="pw-toggle" id="pwToggle" onclick="togglePw()">👁</button>
+      </div>
     </div>
     <button class="login-btn" id="loginBtn" onclick="doLogin()">
       <span id="loginSpinner" class="spinner" style="display:none"></span>
@@ -119,16 +114,41 @@ body::before {
   </div>
 </div>
 
+<!-- TEAM MANAGEMENT -->
+<div class="team-wrap" id="teamWrap" style="display:none">
+  <div class="team-card">
+    <div class="team-title">Team Members <span id="memberCount"></span></div>
+    <div id="memberList"></div>
+    <div class="add-member-row">
+      <input class="add-member-input" id="newMemberEmail" placeholder="new@email.com" type="email">
+      <button class="btn-add" onclick="inviteMember()">+ Invite</button>
+    </div>
+    <div class="team-msg" id="teamMsg"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const ADMIN_EMAIL = 'treborpvv@gmail.com';
+let _sb, _isAdmin = false;
+
+function togglePw() {
+  const input = document.getElementById('password');
+  const btn = document.getElementById('pwToggle');
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+  else { input.type = 'password'; btn.textContent = '👁'; }
+}
+
 async function initLogin() {
   const cfg = await fetch('/api/config').then(r => r.json());
   const { createClient } = supabase;
-  const sb = createClient(cfg.supabase_url, cfg.supabase_key);
-  window._sb = sb;
+  _sb = createClient(cfg.supabase_url, cfg.supabase_key);
+  window._sb = _sb;
 
-  sb.auth.onAuthStateChange((event, session) => { if (session) { const dest = new URLSearchParams(window.location.search).get('redirect') || '/'; window.location.href = dest; } }); const { data } = await sb.auth.getSession();
+  const { data } = await _sb.auth.getSession();
   if (data.session) {
+    _isAdmin = data.session.user.email === ADMIN_EMAIL;
+    if (_isAdmin) showTeamPanel(data.session);
     const dest = new URLSearchParams(window.location.search).get('redirect') || '/';
     window.location.href = dest;
     return;
@@ -155,12 +175,129 @@ async function initLogin() {
     const password = document.getElementById('password').value;
     if (!email || !password) { window._showErr('Enter email and password.'); return; }
     window._setLoading(true);
-    const { error } = await sb.auth.signInWithPassword({ email, password });
+    const { data: loginData, error } = await _sb.auth.signInWithPassword({ email, password });
     if (error) { window._showErr('Invalid email or password.'); window._setLoading(false); return; }
+    if (loginData.session.user.email === ADMIN_EMAIL) {
+      showTeamPanel(loginData.session);
+    }
     const dest = new URLSearchParams(window.location.search).get('redirect') || '/';
     window.location.href = dest;
   };
 }
+
+async function showTeamPanel(session) {
+  document.getElementById('teamWrap').style.display = 'block';
+  await loadMembers(session.access_token);
+}
+
+async function loadMembers(token) {
+  try {
+    const cfg = await fetch('/api/config').then(r => r.json());
+    const res = await fetch(`${cfg.supabase_url}/auth/v1/admin/users`, {
+      headers: {
+        'apikey': cfg.supabase_key,
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const data = await res.json();
+    const users = data.users || [];
+    document.getElementById('memberCount').textContent = users.length + ' members';
+    document.getElementById('memberList').innerHTML = users.map(u => `
+      <div class="member-row">
+        <div class="member-avatar">${(u.email||'?')[0].toUpperCase()}</div>
+        <div class="member-info">
+          <div class="member-email">${u.email}</div>
+          <div class="member-status ${u.email_confirmed_at ? 'confirmed' : 'pending'}">
+            ${u.email_confirmed_at ? '✓ Active' : '⏳ Invite Pending'}
+          </div>
+        </div>
+        <div class="member-actions">
+          ${!u.email_confirmed_at ? `<button class="member-btn btn-invite" onclick="resendInvite('${u.email}')">Resend</button>` : ''}
+          ${u.email !== ADMIN_EMAIL ? `<button class="member-btn btn-remove" onclick="removeMember('${u.id}','${u.email}')">Remove</button>` : ''}
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('memberList').innerHTML = '<div style="font-size:12px;color:var(--muted);font-family:IBM Plex Mono,monospace">Could not load members</div>';
+  }
+}
+
+async function inviteMember() {
+  const email = document.getElementById('newMemberEmail').value.trim();
+  if (!email) return;
+  const msg = document.getElementById('teamMsg');
+  try {
+    const cfg = await fetch('/api/config').then(r => r.json());
+    const { data: s } = await _sb.auth.getSession();
+    const res = await fetch(`${cfg.supabase_url}/auth/v1/admin/users`, {
+      method: 'POST',
+      headers: {
+        'apikey': cfg.supabase_key,
+        'Authorization': `Bearer ${s.session.access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, invite: true })
+    });
+    if (res.ok) {
+      msg.textContent = '✓ Invite sent to ' + email;
+      msg.className = 'team-msg success';
+      msg.style.display = 'block';
+      document.getElementById('newMemberEmail').value = '';
+      const { data: s2 } = await _sb.auth.getSession();
+      await loadMembers(s2.session.access_token);
+    } else {
+      const d = await res.json();
+      msg.textContent = d.msg || 'Failed to invite';
+      msg.className = 'team-msg error';
+      msg.style.display = 'block';
+    }
+  } catch(e) {
+    msg.textContent = 'Error: ' + e.message;
+    msg.className = 'team-msg error';
+    msg.style.display = 'block';
+  }
+}
+
+async function removeMember(id, email) {
+  if (!confirm('Remove ' + email + ' from the system?')) return;
+  const msg = document.getElementById('teamMsg');
+  try {
+    const cfg = await fetch('/api/config').then(r => r.json());
+    const { data: s } = await _sb.auth.getSession();
+    const res = await fetch(`${cfg.supabase_url}/auth/v1/admin/users/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': cfg.supabase_key,
+        'Authorization': `Bearer ${s.session.access_token}`
+      }
+    });
+    if (res.ok) {
+      msg.textContent = '✓ Removed ' + email;
+      msg.className = 'team-msg success';
+      msg.style.display = 'block';
+      const { data: s2 } = await _sb.auth.getSession();
+      await loadMembers(s2.session.access_token);
+    }
+  } catch(e) {
+    msg.textContent = 'Error: ' + e.message;
+    msg.className = 'team-msg error';
+    msg.style.display = 'block';
+  }
+}
+
+async function resendInvite(email) {
+  const msg = document.getElementById('teamMsg');
+  try {
+    await _sb.auth.resetPasswordForEmail(email);
+    msg.textContent = '✓ Invite resent to ' + email;
+    msg.className = 'team-msg success';
+    msg.style.display = 'block';
+  } catch(e) {
+    msg.textContent = 'Error: ' + e.message;
+    msg.className = 'team-msg error';
+    msg.style.display = 'block';
+  }
+}
+
 initLogin();
 </script>
 </body>
