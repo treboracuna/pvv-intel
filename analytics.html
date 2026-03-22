@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async function() {
+  const cfg = await fetch('/api/config').then(r => r.json());
+  const { createClient } = supabase;
+  const sb = createClient(cfg.supabase_url, cfg.supabase_key);
+  window._sb = sb;
+
+  const { data } = await sb.auth.getSession();
+  if (!data.session) {
+    window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+    return;
+  }
+
+  window._logout = async function() {
+    await sb.auth.signOut();
+    window.location.href = '/login.html';
+  };
+})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PVV — Content Analytics</title>
@@ -100,7 +121,7 @@ select option { background: var(--surface2); }
 <body>
 <nav>
   <div class="nav-logo">PVV <span>/ Analytics</span></div>
-  <div class="nav-links">
+  <div class="nav-links"><button onclick="_logout()" style="font-size:11px;color:var(--muted);background:transparent;border:1px solid var(--border);padding:6px 14px;border-radius:4px;cursor:pointer;font-family:Syne,sans-serif;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.15s" onmouseover="this.style.color='#ff4d4d';this.style.borderColor='#ff4d4d'" onmouseout="this.style.color='#4a5568';this.style.borderColor='#1a2030'">Logout</button>
     <a href="/">Generator</a>
     <a href="/analytics.html" class="active">Analytics</a>
   </div>
