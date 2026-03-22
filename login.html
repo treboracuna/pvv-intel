@@ -138,13 +138,25 @@ async function initLogin() {
     if (e.key === 'Enter') doLogin();
   });
 
+  window._showErr = function(msg) {
+    const el = document.getElementById('errMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+  };
+
+  window._setLoading = function(on) {
+    document.getElementById('loginBtn').disabled = on;
+    document.getElementById('loginSpinner').style.display = on ? 'inline-block' : 'none';
+    document.getElementById('loginLbl').textContent = on ? 'Signing in...' : 'Access System';
+  };
+
   window.doLogin = async function() {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    if (!email || !password) { showErr('Enter email and password.'); return; }
-    setLoading(true);
+    if (!email || !password) { window._showErr('Enter email and password.'); return; }
+    window._setLoading(true);
     const { error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) { showErr('Invalid email or password.'); setLoading(false); return; }
+    if (error) { window._showErr('Invalid email or password.'); window._setLoading(false); return; }
     const dest = new URLSearchParams(window.location.search).get('redirect') || '/';
     window.location.href = dest;
   };
