@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PVV — Content Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #07090d; --surface: #0c0f15; --surface2: #11151d;
+  --border: #1a2030; --border2: #232d40;
+  --accent: #d4f53c; --accent-dim: rgba(212,245,60,0.08);
+  --green: #2ecc8a; --green-dim: rgba(46,204,138,0.08);
+  --red: #ff4d4d; --red-dim: rgba(255,77,77,0.08);
+  --orange: #ff8c3a; --text: #dde2ee; --muted: #4a5568;
+}
+body { background: var(--bg); color: var(--text); font-family: "Syne", sans-serif; min-height: 100vh; }
+body::before {
+  content: ""; position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(212,245,60,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(212,245,60,0.025) 1px, transparent 1px);
+  background-size: 44px 44px; pointer-events: none; z-index: 0;
+}
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(7,9,13,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px; height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo { font-size: 14px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
+.nav-logo span { color: var(--muted); font-weight: 400; }
+.nav-links { display: flex; gap: 20px; }
+.nav-links a { font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.15s; }
+.nav-links a:hover, .nav-links a.active { color: var(--accent); }
+.container { position: relative; z-index: 1; max-width: 1060px; margin: 0 auto; padding: 40px 24px 80px; }
+.slabel { display: flex; align-items: center; gap: 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+.slabel::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+.slabel span { color: var(--accent); }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 28px; margin-bottom: 24px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+@media(max-width:600px){ .grid2,.grid3,.grid4 { grid-template-columns: 1fr; } }
+.field label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+.field input, .field select, .field textarea {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); font-family: "IBM Plex Mono", monospace; font-size: 13px;
+  padding: 10px 14px; border-radius: 5px; outline: none; transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+select option { background: var(--surface2); }
+.toggle-row { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
+.toggle-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); cursor: pointer; }
+.toggle-item input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+.btn { padding: 12px 24px; font-family: "Syne", sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; border: none; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: #000; width: 100%; }
+.btn-primary:hover:not(:disabled) { background: #e8ff60; }
+.btn-primary:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; }
+.btn-secondary { background: transparent; border: 1px solid var(--border2); color: var(--muted); }
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { width: 13px; height: 13px; border: 2px solid rgba(0,0,0,0.3); border-top-color: #000; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
+.metric { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 16px; text-align: center; }
+.metric-val { display: block; font-family: "IBM Plex Mono", monospace; font-size: 22px; font-weight: 500; color: var(--accent); margin-bottom: 4px; }
+.metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.video-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 16px; }
+.video-rank { font-family: "IBM Plex Mono", monospace; font-size: 18px; font-weight: 500; color: var(--muted); width: 32px; flex-shrink: 0; }
+.video-info { flex: 1; }
+.video-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.video-meta { font-size: 11px; color: var(--muted); font-family: "IBM Plex Mono", monospace; }
+.video-stats { display: flex; gap: 12px; flex-shrink: 0; }
+.stat { text-align: center; }
+.stat-val { font-family: "IBM Plex Mono", monospace; font-size: 14px; font-weight: 500; color: var(--text); display: block; }
+.stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.sauce-box { background: var(--accent-dim); border: 1px solid rgba(212,245,60,0.2); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+.sauce-label { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+.sauce-text { font-size: 15px; color: var(--text); line-height: 1.65; font-weight: 600; }
+.elim-item { display: flex; gap: 10px; font-size: 13px; color: var(--text); line-height: 1.5; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.elim-icon { color: var(--red); flex-shrink: 0; }
+.win-item { display: flex; gap: 10px; font-size: 13px; color: var(--text); line-height: 1.5; margin-bottom: 8px; }
+.win-icon { color: var(--green); flex-shrink: 0; }
+.next-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 10px; }
+.next-title { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+.next-hook { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--text); background: var(--surface); border-left: 2px solid var(--accent); padding: 8px 12px; border-radius: 0 4px 4px 0; margin-bottom: 8px; }
+.next-why { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.tag { font-family: "IBM Plex Mono", monospace; font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 500; text-transform: uppercase; }
+.tag-green { background: var(--green-dim); color: var(--green); }
+.tag-accent { background: var(--accent-dim); color: var(--accent); }
+.success-msg { background: var(--green-dim); border: 1px solid rgba(46,204,138,0.2); border-radius: 6px; padding: 12px 16px; color: var(--green); font-size: 13px; margin-bottom: 16px; font-family: "IBM Plex Mono", monospace; }
+.error-msg { background: var(--red-dim); border: 1px solid rgba(255,77,77,0.25); border-radius: 6px; padding: 12px 16px; color: var(--red); font-size: 13px; margin-bottom: 16px; font-family: "IBM Plex Mono", monospace; }
+@keyframes fadein { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.fadein { animation: fadein 0.35s ease forwards; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">PVV <span>/ Analytics</span></div>
+  <div class="nav-links">
+    <a href="/">Generator</a>
+    <a href="/analytics.html" class="active">Analytics</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- LOG VIDEO -->
+  <div class="slabel">Log a Video</div>
+  <div class="panel">
+    <div id="formMsg"></div>
+    <div class="grid2">
+      <div class="field"><label>Video Title</label><input id="v_title" placeholder="e.g. This listing sold in 2 days"></div>
+      <div class="field"><label>Platform</label>
+        <select id="v_platform">
+          <option>Instagram Reels</option>
+          <option>TikTok</option>
+          <option>YouTube Shorts</option>
+          <option>LinkedIn</option>
+        </select>
+      </div>
+      <div class="field"><label>Format</label><input id="v_format" placeholder="e.g. Before/After, POV, Hot Take"></div>
+      <div class="field"><label>Date Posted</label><input type="date" id="v_date"></div>
+    </div>
+    <div class="field" style="margin-bottom:16px">
+      <label>Hook Used (first 3 seconds)</label>
+      <input id="v_hook" placeholder="Exact opening line or text on screen">
+    </div>
+    <div class="grid3">
+      <div class="field"><label>Views</label><input type="number" id="v_views" placeholder="0"></div>
+      <div class="field"><label>Likes</label><input type="number" id="v_likes" placeholder="0"></div>
+      <div class="field"><label>Comments</label><input type="number" id="v_comments" placeholder="0"></div>
+      <div class="field"><label>Shares</label><input type="number" id="v_shares" placeholder="0"></div>
+      <div class="field"><label>Reach</label><input type="number" id="v_reach" placeholder="0"></div>
+      <div class="field"><label>Watch Time %</label><input type="number" id="v_watch" placeholder="0" min="0" max="100"></div>
+    </div>
+    <div class="toggle-row">
+      <label class="toggle-item"><input type="checkbox" id="v_dm"> Led to DM</label>
+      <label class="toggle-item"><input type="checkbox" id="v_booking"> Led to Booking</label>
+    </div>
+    <div class="field" style="margin-bottom:18px">
+      <label>Notes (optional)</label>
+      <input id="v_notes" placeholder="Anything else worth noting">
+    </div>
+    <button class="btn btn-primary" id="saveBtn" onclick="saveVideo()">
+      <span id="saveSpinner" style="display:none" class="spinner"></span>
+      <span id="saveLbl">+ Log This Video</span>
+    </button>
+  </div>
+
+  <!-- STATS OVERVIEW -->
+  <div id="statsWrap" style="display:none">
+    <div class="slabel">Performance Overview</div>
+    <div class="grid4" id="overviewMetrics"></div>
+  </div>
+
+  <!-- SECRET SAUCE -->
+  <div id="sauceWrap" style="display:none">
+    <div class="slabel">Secret Sauce <span>— Your Personal Viral Formula</span></div>
+    <div id="sauceContent"></div>
+  </div>
+
+  <!-- VIDEO LOG -->
+  <div id="logWrap" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="slabel" style="margin-bottom:0;flex:1">Video Log</div>
+      <button class="btn btn-secondary" onclick="runAnalysis()" id="analyzeBtn" style="margin-left:16px;padding:8px 16px;font-size:11px">
+        <span id="analyzeSpinner" style="display:none" class="spinner" style="border-color:var(--muted);border-top-color:var(--accent)"></span>
+        <span id="analyzeLbl">Run Pattern Analysis</span>
+      </button>
+    </div>
+    <div id="videoLog"></div>
+  </div>
+
+</div>
+
+<script>
+// Set default date to today
+document.getElementById('v_date').value = new Date().toISOString().slice(0,10);
+
+async function saveVideo() {
+  const title = document.getElementById('v_title').value.trim();
+  const hook = document.getElementById('v_hook').value.trim();
+  if (!title || !hook) { showMsg('Fill in Title and Hook at minimum.', 'error'); return; }
+
+  setBtnLoading('saveBtn', 'saveSpinner', 'saveLbl', true, 'Saving...');
+
+  const payload = {
+    action: 'save',
+    title,
+    platform: document.getElementById('v_platform').value,
+    format: document.getElementById('v_format').value,
+    hook,
+    posted_date: document.getElementById('v_date').value,
+    views: document.getElementById('v_views').value,
+    likes: document.getElementById('v_likes').value,
+    comments: document.getElementById('v_comments').value,
+    shares: document.getElementById('v_shares').value,
+    reach: document.getElementById('v_reach').value,
+    watch_time_pct: document.getElementById('v_watch').value,
+    led_to_dm: document.getElementById('v_dm').checked,
+    led_to_booking: document.getElementById('v_booking').checked,
+    notes: document.getElementById('v_notes').value
+  };
+
+  try {
+    const res = await fetch('/api/analytics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (data.error || (Array.isArray(data) && data[0]?.code)) {
+      throw new Error(data.message || data.error || 'Save failed — make sure the pvv_videos table exists in Supabase');
+    }
+    showMsg('Video logged successfully.', 'success');
+    clearForm();
+    loadVideos();
+  } catch(e) {
+    showMsg('Error: ' + e.message, 'error');
+  }
+  setBtnLoading('saveBtn', 'saveSpinner', 'saveLbl', false, '+ Log This Video');
+}
+
+async function loadVideos() {
+  try {
+    const res = await fetch('/api/analytics');
+    const videos = await res.json();
+    if (!Array.isArray(videos) || videos.length === 0) return;
+
+    document.getElementById('logWrap').style.display = 'block';
+    document.getElementById('statsWrap').style.display = 'block';
+
+    // Overview metrics
+    const totalViews = videos.reduce((s,v) => s + (v.views||0), 0);
+    const avgWatch = videos.length ? (videos.reduce((s,v) => s + (v.watch_time_pct||0), 0) / videos.length).toFixed(1) : 0;
+    const bookings = videos.filter(v => v.led_to_booking).length;
+    const topVideo = [...videos].sort((a,b) => (b.views||0)-(a.views||0))[0];
+
+    document.getElementById('overviewMetrics').innerHTML = [
+      { v: videos.length, l: 'Videos Logged' },
+      { v: totalViews.toLocaleString(), l: 'Total Views' },
+      { v: avgWatch + '%', l: 'Avg Watch Time' },
+      { v: bookings, l: 'Bookings Generated' }
+    ].map(m => `<div class="metric"><span class="metric-val">${m.v}</span><span class="metric-label">${m.l}</span></div>`).join('');
+
+    // Video log
+    const sorted = [...videos].sort((a,b) => (b.views||0)-(a.views||0));
+    document.getElementById('videoLog').innerHTML = sorted.map((v,i) => `
+      <div class="video-card">
+        <div class="video-rank">${String(i+1).padStart(2,'0')}</div>
+        <div class="video-info">
+          <div class="video-title">${escHtml(v.title)}</div>
+          <div class="video-meta">${v.platform} · ${v.format || 'No format'} · ${v.posted_date || ''}</div>
+          <div style="margin-top:6px;font-size:11px;color:var(--muted);font-style:italic">"${escHtml(v.hook)}"</div>
+          <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+            ${v.led_to_dm ? '<span class="tag tag-green">DM</span>' : ''}
+            ${v.led_to_booking ? '<span class="tag tag-accent">Booking</span>' : ''}
+          </div>
+        </div>
+        <div class="video-stats">
+          <div class="stat"><span class="stat-val">${(v.views||0).toLocaleString()}</span><span class="stat-lbl">Views</span></div>
+          <div class="stat"><span class="stat-val">${v.watch_time_pct||0}%</span><span class="stat-lbl">Watch</span></div>
+          <div class="stat"><span class="stat-val">${v.shares||0}</span><span class="stat-lbl">Shares</span></div>
+        </div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+async function runAnalysis() {
+  setBtnLoading('analyzeBtn', 'analyzeSpinner', 'analyzeLbl', true, 'Analyzing...');
+  try {
+    const res = await fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'analyze' })
+    });
+    const data = await res.json();
+
+    if (data.insight) {
+      showMsg(data.insight, 'success');
+      setBtnLoading('analyzeBtn', 'analyzeSpinner', 'analyzeLbl', false, 'Run Pattern Analysis');
+      return;
+    }
+
+    const a = data.analysis;
+    const wrap = document.getElementById('sauceWrap');
+    wrap.style.display = 'block';
+    wrap.className = 'fadein';
+
+    document.getElementById('sauceContent').innerHTML = `
+      <div class="sauce-box">
+        <div class="sauce-label">🔥 Your Secret Sauce Formula</div>
+        <div class="sauce-text">${escHtml(a.secret_sauce)}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div class="panel" style="margin-bottom:0">
+          <div class="slabel" style="margin-bottom:12px">What's Working</div>
+          ${(a.winning_formats||[]).map(f => `<div class="win-item"><span class="win-icon">✓</span><span>${escHtml(f)}</span></div>`).join('')}
+          ${(a.winning_hooks||[]).map(h => `<div class="win-item"><span class="win-icon">↗</span><span>${escHtml(h)}</span></div>`).join('')}
+        </div>
+        <div class="panel" style="margin-bottom:0">
+          <div class="slabel" style="margin-bottom:12px">Eliminate</div>
+          ${(a.eliminate||[]).map(e => `<div class="elim-item"><span class="elim-icon">✕</span><span>${escHtml(e)}</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="slabel">Next 3 Videos to Create <span>— Based on Your Data</span></div>
+      ${(a.next_3_videos||[]).map(v => `
+        <div class="next-card">
+          <div class="next-title">${escHtml(v.title)}</div>
+          <div class="next-hook">${escHtml(v.hook)}</div>
+          <div class="next-why">${escHtml(v.why)}</div>
+        </div>`).join('')}
+    `;
+  } catch(e) {
+    showMsg('Analysis error: ' + e.message, 'error');
+  }
+  setBtnLoading('analyzeBtn', 'analyzeSpinner', 'analyzeLbl', false, 'Run Pattern Analysis');
+}
+
+function setBtnLoading(btnId, spinnerId, lblId, on, txt) {
+  document.getElementById(btnId).disabled = on;
+  document.getElementById(spinnerId).style.display = on ? 'inline-block' : 'none';
+  document.getElementById(lblId).textContent = txt;
+}
+
+function showMsg(msg, type) {
+  const el = document.getElementById('formMsg');
+  el.className = type === 'error' ? 'error-msg' : 'success-msg';
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+
+function clearForm() {
+  ['v_title','v_format','v_hook','v_views','v_likes','v_comments','v_shares','v_reach','v_watch','v_notes'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('v_dm').checked = false;
+  document.getElementById('v_booking').checked = false;
+  document.getElementById('v_date').value = new Date().toISOString().slice(0,10);
+}
+
+function escHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+loadVideos();
+</script>
+</body>
+</html>
