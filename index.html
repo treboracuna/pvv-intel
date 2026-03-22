@@ -585,6 +585,23 @@ footer {
 .cal-action-btn:hover { border-color: var(--accent); color: var(--accent); }
 .cal-action-btn.cal-primary { background: var(--accent); color: #000; border-color: var(--accent); }
 .cal-action-btn.cal-primary:hover { background: #e8ff60; }
+
+.intel-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 24px; }
+.intel-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media(max-width:700px){ .intel-grid { grid-template-columns: 1fr; } }
+.intel-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.intel-card-title { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
+.intel-item { font-size: 13px; color: var(--text); line-height: 1.5; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: flex-start; }
+.intel-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.intel-bullet { flex-shrink: 0; margin-top: 5px; width: 6px; height: 6px; border-radius: 50%; }
+.bullet-rising { background: #2ecc8a; }
+.bullet-emerging { background: #d4f53c; }
+.bullet-algo { background: #ff8c3a; }
+.momentum-badge { display: inline-flex; align-items: center; font-family: "IBM Plex Mono", monospace; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+.momentum-rising { background: rgba(46,204,138,0.12); color: #2ecc8a; }
+.momentum-emerging { background: rgba(212,245,60,0.1); color: #d4f53c; }
+.momentum-peaked { background: rgba(255,140,58,0.1); color: #ff8c3a; }
+.time-badge { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(212,245,60,0.15); padding: 3px 10px; border-radius: 4px; display: inline-block; margin-top: 5px; }
 </style>
 </head>
 <body>
@@ -791,7 +808,9 @@ Return ONLY valid JSON. No markdown fences, no explanation, no preamble. Raw JSO
     "avg_hook_length": "X seconds",
     "top_emotional_trigger": "name",
     "best_posting_days": ["Day1","Day2"],
-    "engagement_pattern": "one sentence description of what drives engagement on this platform for this niche"
+    "engagement_pattern": "one sentence description of what drives engagement on this platform for this niche",
+    "algorithm_insight": "what this platform is currently pushing based on latest algorithm data",
+    "radar_topics": ["emerging topic 1", "emerging topic 2", "emerging topic 3"]
   },
   "ideas": [
     {
@@ -804,6 +823,8 @@ Return ONLY valid JSON. No markdown fences, no explanation, no preamble. Raw JSO
       "cta": "The exact call to action at the end",
       "why_it_performs": "2-3 sentences explaining the specific proven pattern that makes this drive inbound clients",
       "fire_factor": "HIGH or MEDIUM",
+      "momentum_signal": "RISING or PEAKED or EMERGING",
+      "best_post_time": "e.g. Tuesday 7-9PM",
       "viral_score": <integer 1-100 based on hook strength, emotional trigger, format performance, and conversion potential for real estate audience>
       "audio": [
         {"title": "Song Title", "artist": "Artist Name", "mood": "why it fits this video"},
@@ -886,6 +907,7 @@ function renderResults(data) {
           <span class="tag tag-accent">${escHtml(activePlat)}</span>
           <span class="tag tag-green">${escHtml(idea.format)}</span>
           ${idea.fire_factor === 'HIGH' ? '<span class="tag tag-red">🔥 High</span>' : ''}
+          ${idea.momentum_signal ? `<span class="momentum-badge momentum-${(idea.momentum_signal||'rising').toLowerCase()}">${escHtml(idea.momentum_signal)}</span>` : ''}
           ${idea.viral_score ? `<span class="tag" style="background:${idea.viral_score>=80?'rgba(46,204,138,0.15)':idea.viral_score>=60?'rgba(212,245,60,0.1)':'rgba(255,140,58,0.1)'};color:${idea.viral_score>=80?'#2ecc8a':idea.viral_score>=60?'#d4f53c':'#ff8c3a'}">⚡ ${idea.viral_score}</span>` : ''}
         </div>
         <span class="chevron">▼</span>
@@ -908,6 +930,7 @@ function renderResults(data) {
           <div class="cblock-label">Emotional Trigger</div>
           <div class="body-text">${escHtml(idea.emotional_trigger)}</div>
         </div>
+        ${idea.best_post_time ? `<div class="cblock"><div class="cblock-label">Best Time to Post</div><div class="time-badge">📅 ${escHtml(idea.best_post_time)}</div></div>` : ''}
         <div class="cblock">
           <div class="cblock-label">Call to Action</div>
           <div class="body-text">${escHtml(idea.cta)}</div>
@@ -951,6 +974,23 @@ function renderResults(data) {
         <div class="pattern-item"><span class="p-icon">›</span><span><strong>Engagement:</strong> ${escHtml(data.patterns.engagement_pattern)}</span></div>
       </div>
     </div>
+    <div class="slabel">Intelligence Layer <span>— Live Platform Data</span></div>
+    <div class="intel-panel" style="margin-bottom:24px">
+      <div class="intel-grid">
+        <div class="intel-card">
+          <div class="intel-card-title">📡 Trend Radar</div>
+          <div id="radarItems"><div class="intel-item" style="color:var(--muted)">Generate to see emerging topics</div></div>
+        </div>
+        <div class="intel-card">
+          <div class="intel-card-title">⚙️ Algorithm Intel</div>
+          <div id="algoItems"><div class="intel-item" style="color:var(--muted)">Generate to see algorithm data</div></div>
+        </div>
+        <div class="intel-card">
+          <div class="intel-card-title">🕐 Best Time to Post</div>
+          <div id="timeItems"><div class="intel-item" style="color:var(--muted)">Generate to see posting times</div></div>
+        </div>
+      </div>
+    </div>
     <div class="slabel">Weekly Execution Schedule</div>
     <div class="sched-row">${schedHTML}</div>
     <div class="slabel">Content Execution Plans</div>
@@ -966,6 +1006,7 @@ function renderResults(data) {
     badge.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#2ecc8a;display:inline-block"></span> Live trend + audio data used';
     el.prepend(badge);
   }
+  renderIntelligence(data.patterns);
   renderSaved();
   initCalendar(data.ideas);
 }
@@ -1062,6 +1103,31 @@ function deleteIdea(i) {
   saved.splice(i, 1);
   try { localStorage.setItem('pvv_saved', JSON.stringify(saved)); } catch {}
   renderSaved();
+}
+
+function renderIntelligence(patterns) {
+  if (!patterns) return;
+  const radar = document.getElementById('radarItems');
+  if (radar) {
+    const topics = patterns.radar_topics || [];
+    radar.innerHTML = topics.length
+      ? topics.map(t => `<div class="intel-item"><span class="intel-bullet bullet-emerging"></span><span>${escHtml(t)}</span></div>`).join('')
+      : '<div class="intel-item" style="color:var(--muted)">No radar data</div>';
+  }
+  const algo = document.getElementById('algoItems');
+  if (algo) {
+    const insight = patterns.algorithm_insight || '';
+    algo.innerHTML = insight
+      ? `<div class="intel-item"><span class="intel-bullet bullet-algo"></span><span>${escHtml(insight)}</span></div>`
+      : '<div class="intel-item" style="color:var(--muted)">No algorithm data</div>';
+  }
+  const timeEl = document.getElementById('timeItems');
+  if (timeEl && currentData) {
+    const times = [...new Set((currentData.ideas || []).map(i => i.best_post_time).filter(Boolean))].slice(0, 3);
+    timeEl.innerHTML = times.length
+      ? times.map(t => `<div class="intel-item"><span class="intel-bullet bullet-rising"></span><span>${escHtml(t)}</span></div>`).join('')
+      : '<div class="intel-item" style="color:var(--muted)">No timing data</div>';
+  }
 }
 
 function renderSaved() {
