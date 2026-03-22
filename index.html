@@ -512,6 +512,14 @@ footer {
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+.audio-list { display: flex; flex-direction: column; gap: 8px; }
+.audio-item { display: flex; align-items: center; gap: 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; }
+.audio-icon { font-size: 16px; flex-shrink: 0; }
+.audio-info { flex: 1; }
+.audio-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.audio-artist { font-size: 11px; color: var(--muted); font-family: "IBM Plex Mono", monospace; }
+.audio-mood { font-size: 11px; color: var(--green); margin-top: 3px; font-style: italic; }
 </style>
 </head>
 <body>
@@ -540,7 +548,7 @@ footer {
   <!-- INPUT PANEL -->
   <div class="panel">
     <div class="slabel">Parameters</div>
-    <div class="grid2">
+    <div class="grid2" style="grid-template-columns:1fr 1fr;">
       <div class="field">
         <label>Niche</label>
         <input type="text" id="niche" value="Real estate videography / visual media">
@@ -557,6 +565,10 @@ footer {
       <div class="field">
         <label>Target Audience</label>
         <input type="text" id="audience" value="Real estate agents, brokers, developers in RGV/TX">
+      </div>
+      <div class="field">
+        <label>Location / Market</label>
+        <input type="text" id="location" value="Rio Grande Valley, Texas">
       </div>
       <div class="field">
         <label>Ideas to Generate</label>
@@ -662,6 +674,7 @@ async function runSystem() {
   const goal = document.getElementById('goal').value;
   const count = document.getElementById('count').value;
   const ctx = document.getElementById('ctx').value.trim();
+  const location = document.getElementById('location').value.trim();
 
   const prompt = `You are a viral content strategy system for Prestige Valley Visuals (PVV), a premium real estate video production company.
 
@@ -692,7 +705,12 @@ Return ONLY valid JSON. No markdown fences, no explanation, no preamble. Raw JSO
       "structure": ["step 1","step 2","step 3","step 4","step 5"],
       "cta": "The exact call to action at the end",
       "why_it_performs": "2-3 sentences explaining the specific proven pattern that makes this drive inbound clients",
-      "fire_factor": "HIGH or MEDIUM"
+      "fire_factor": "HIGH or MEDIUM",
+      "audio": [
+        {"title": "Song Title", "artist": "Artist Name", "mood": "why it fits this video"},
+        {"title": "Song Title", "artist": "Artist Name", "mood": "why it fits this video"},
+        {"title": "Song Title", "artist": "Artist Name", "mood": "why it fits this video"}
+      ]
     }
   ],
   "weekly_schedule": {
@@ -717,11 +735,15 @@ Rules:
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4000,
-        messages: [{ role: 'user', content: prompt }]
+        messages: [{ role: 'user', content: prompt }],
+        platform: activePlat,
+        niche: niche,
+        location: location
       })
     });
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
+    window._trendUsed = data._trend_data_used || false;
     const raw = data.content[0].text.trim().replace(/```json|```/g, '').trim();
     currentData = JSON.parse(raw);
     renderResults(currentData);
@@ -793,6 +815,20 @@ function renderResults(data) {
           <div class="cblock-label">Why It Performs</div>
           <div class="why-box">${escHtml(idea.why_it_performs)}</div>
         </div>
+        ${(idea.audio && idea.audio.length) ? `
+        <div class="cblock">
+          <div class="cblock-label">🎵 Recommended Audio</div>
+          <div class="audio-list">${(idea.audio || []).map(a => `
+            <div class="audio-item">
+              <span class="audio-icon">♪</span>
+              <div class="audio-info">
+                <div class="audio-title">${escHtml(a.title)}</div>
+                <div class="audio-artist">${escHtml(a.artist)}</div>
+                <div class="audio-mood">${escHtml(a.mood)}</div>
+              </div>
+            </div>`).join('')}
+          </div>
+        </div>` : ''}
         <button class="save-btn" onclick="saveIdea(${i})">+ Save Idea</button>
       </div>
     </div>`).join('');
@@ -815,6 +851,12 @@ function renderResults(data) {
 
   el.className = 'fadein';
   el.style.display = 'block';
+  if (window._trendUsed) {
+    const badge = document.createElement('div');
+    badge.style.cssText = 'display:inline-flex;align-items:center;gap:6px;font-family:IBM Plex Mono,monospace;font-size:11px;color:#2ecc8a;background:rgba(46,204,138,0.08);border:1px solid rgba(46,204,138,0.2);padding:5px 12px;border-radius:20px;margin-bottom:16px;';
+    badge.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#2ecc8a;display:inline-block"></span> Live trend + audio data used';
+    el.prepend(badge);
+  }
   renderSaved();
 }
 
