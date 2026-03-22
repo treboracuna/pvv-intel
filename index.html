@@ -255,6 +255,85 @@ nav {
 .field textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
 select option { background: var(--surface2); }
 
+/* TREND ALERT PANEL */
+.trend-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.trend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.trend-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.trend-header-left .pulse-dot { width: 6px; height: 6px; }
+.trend-time {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+}
+.trend-refresh-btn {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.trend-refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+.trend-refresh-btn.loading { opacity: 0.5; pointer-events: none; }
+.trend-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media(max-width:600px){ .trend-grid { grid-template-columns: 1fr; } }
+.trend-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 14px 16px;
+  transition: border-color 0.15s;
+  text-decoration: none;
+  display: block;
+}
+.trend-card:hover { border-color: var(--border2); }
+.trend-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.trend-card-source {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.trend-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 32px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 /* RUN BUTTON */
 .run-btn {
   width: 100%;
@@ -751,6 +830,23 @@ footer {
   <h1>Turn Content Into<br><em>Inbound Clients</em></h1>
   <p class="hero-sub">AI-powered viral content strategy. Real patterns. Immediate execution plans. Built to convert viewers into paying real estate clients.</p>
   <a href="#generator" class="hero-cta">▶ Launch Generator</a>
+</div>
+
+<!-- TREND ALERTS -->
+<div class="container" style="padding-bottom:0">
+  <div class="slabel">Trend Alerts <span>Live</span></div>
+  <div class="trend-panel" id="trendPanel">
+    <div class="trend-header">
+      <div class="trend-header-left">
+        <div class="pulse-dot"></div>
+        <span class="trend-time" id="trendTime">Loading...</span>
+      </div>
+      <button class="trend-refresh-btn" id="trendRefreshBtn" onclick="fetchTrends()">↺ Refresh</button>
+    </div>
+    <div class="trend-grid" id="trendGrid">
+      <div class="trend-empty">Loading trends...</div>
+    </div>
+  </div>
 </div>
 
 <!-- MAIN APP -->
@@ -1466,9 +1562,92 @@ function renderCalendar() {
 try { calState = JSON.parse(localStorage.getItem('pvv_calendar') || '{}'); } catch { calState = {}; }
 // ---- END CALENDAR ----
 
+// ---- TREND ALERTS ----
+const TREND_CACHE_KEY = 'pvv_trends';
+const TREND_SCHEDULE = [8, 12, 17]; // 8am, 12pm, 5pm
+
+function shouldAutoRefreshTrends() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(TREND_CACHE_KEY));
+    if (!cached || !cached.fetched_at) return true;
+    const last = new Date(cached.fetched_at);
+    const now = new Date();
+    if (last.toDateString() !== now.toDateString()) return true;
+    const lastHour = last.getHours();
+    const nowHour = now.getHours();
+    for (const h of TREND_SCHEDULE) {
+      if (nowHour >= h && lastHour < h) return true;
+    }
+    return false;
+  } catch { return true; }
+}
+
+function renderTrends(data) {
+  const grid = document.getElementById('trendGrid');
+  const timeEl = document.getElementById('trendTime');
+  if (!data || !data.trends || data.trends.length === 0) {
+    grid.innerHTML = '<div class="trend-empty">No trends available right now</div>';
+    timeEl.textContent = 'Unable to load';
+    return;
+  }
+  const t = new Date(data.fetched_at);
+  timeEl.textContent = 'Updated ' + t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  grid.innerHTML = data.trends.map(tr => `
+    <a class="trend-card" href="${tr.url}" target="_blank" rel="noopener">
+      <div class="trend-card-title">${tr.title}</div>
+      <div class="trend-card-source">${tr.source}</div>
+    </a>`).join('');
+}
+
+async function fetchTrends() {
+  const btn = document.getElementById('trendRefreshBtn');
+  btn.classList.add('loading');
+  btn.textContent = '↺ Loading...';
+  try {
+    const resp = await fetch('/api/trends');
+    if (!resp.ok) throw new Error('API error');
+    const data = await resp.json();
+    localStorage.setItem(TREND_CACHE_KEY, JSON.stringify(data));
+    renderTrends(data);
+  } catch (e) {
+    const cached = localStorage.getItem(TREND_CACHE_KEY);
+    if (cached) {
+      renderTrends(JSON.parse(cached));
+    } else {
+      document.getElementById('trendGrid').innerHTML = '<div class="trend-empty">Failed to load trends</div>';
+    }
+  } finally {
+    btn.classList.remove('loading');
+    btn.textContent = '↺ Refresh';
+  }
+}
+
+function initTrends() {
+  if (shouldAutoRefreshTrends()) {
+    fetchTrends();
+  } else {
+    try {
+      const cached = JSON.parse(localStorage.getItem(TREND_CACHE_KEY));
+      renderTrends(cached);
+    } catch { fetchTrends(); }
+  }
+  // Schedule next auto-refresh check
+  const now = new Date();
+  for (const h of TREND_SCHEDULE) {
+    const target = new Date(now);
+    target.setHours(h, 0, 0, 0);
+    if (target > now) {
+      const ms = target - now;
+      setTimeout(() => fetchTrends(), ms);
+    }
+  }
+}
+// ---- END TREND ALERTS ----
+
 initPlatforms();
 renderSaved();
 loadHooks();
+initTrends();
 </script>
 </body>
 </html>
