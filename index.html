@@ -849,6 +849,35 @@ footer {
   </div>
 </div>
 
+<!-- COMPANY PROFILE -->
+<div class="container" style="padding-bottom:0" id="profileSection">
+  <div class="slabel">Company Profile <span id="profileStatus"></span></div>
+  <div class="panel" id="profilePanel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-size:13px;color:var(--text);font-weight:700">PVV Intelligence Profile</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="toggleProfile()" id="profileToggleBtn" style="padding:6px 14px;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:Syne,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:4px;cursor:pointer;transition:all 0.15s">Edit</button>
+        <button onclick="saveProfile()" id="profileSaveBtn" style="display:none;padding:6px 14px;background:var(--accent);color:#000;border:none;font-family:Syne,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:4px;cursor:pointer">Save</button>
+      </div>
+    </div>
+    <div id="profileView" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"></div>
+    <div id="profileEdit" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div class="field"><label>Active Clients</label><input type="text" id="pf_clients" placeholder="e.g. Texaswide Insurance, Exclusiva Homes"></div>
+        <div class="field"><label>Client Count</label><input type="number" id="pf_client_count" placeholder="2"></div>
+        <div class="field"><label>Testimonials Collected</label><input type="number" id="pf_testimonials" placeholder="0"></div>
+        <div class="field"><label>Shoots Completed</label><input type="number" id="pf_shoots" placeholder="20"></div>
+        <div class="field"><label>Business Stage</label><select id="pf_stage"><option>Early-stage active</option><option>Growing</option><option>Scaling</option><option>Established</option></select></div>
+        <div class="field"><label>Team Size</label><input type="number" id="pf_team" placeholder="2"></div>
+      </div>
+      <div class="field" style="margin-bottom:14px"><label>Equipment Available</label><input type="text" id="pf_equipment" placeholder="iPhone 17 Pro Max, Sony ZV-E10, DJI Mini 3, DJI RS4 Mini, RODE Wireless GO II, 50W LED"></div>
+      <div class="field" style="margin-bottom:14px"><label>Current Focus / Notes</label><textarea id="pf_notes" style="min-height:60px" placeholder="e.g. Pushing same-day photos, targeting agents with listings 300K+, need testimonials"></textarea></div>
+      <div class="field"><label>Clients Eligible for Testimonial</label><input type="text" id="pf_testimonial_eligible" placeholder="e.g. Texaswide Insurance (6mo+), Exclusiva Homes"></div>
+    </div>
+    <div id="profileAlerts" style="margin-top:16px"></div>
+  </div>
+</div>
+
 <!-- MAIN APP -->
 <div class="container" id="generator">
 
@@ -1010,7 +1039,7 @@ async function runSystem() {
 
   const goal = document.getElementById('goal').value;
   const count = document.getElementById('count').value;
-  const ctx = document.getElementById('ctx').value.trim();
+  const ctx = document.getElementById("ctx").value.trim() + getProfileContext();
   const location = document.getElementById('location').value.trim();
 
   const prompt = `You are a viral content strategy system for Prestige Valley Visuals (PVV), a premium real estate video production company.
@@ -1644,7 +1673,136 @@ function initTrends() {
 }
 // ---- END TREND ALERTS ----
 
+// ---- COMPANY PROFILE ----
+const PROFILE_KEY = "pvv_company_profile";
+const PROFILE_UPDATED_KEY = "pvv_profile_updated";
+
+const DEFAULT_PROFILE = {
+  clients: "Texaswide Insurance, Exclusiva Homes",
+  client_count: 2,
+  testimonials: 0,
+  shoots: 20,
+  stage: "Early-stage active",
+  team: 2,
+  equipment: "iPhone 17 Pro Max, Sony ZV-E10, DJI Mini 3, DJI RS4 Mini, RODE Wireless GO II, 50W LED, Adobe CC",
+  notes: "Pushing same-day photos as wedge. Targeting agents with listings 300K+. Need to collect first testimonials. Prove it and position it phase.",
+  testimonial_eligible: "Texaswide Insurance, Exclusiva Homes"
+};
+
+function loadProfile() {
+  try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || DEFAULT_PROFILE; } catch { return DEFAULT_PROFILE; }
+}
+
+function saveProfile() {
+  const p = {
+    clients: document.getElementById("pf_clients").value,
+    client_count: document.getElementById("pf_client_count").value,
+    testimonials: document.getElementById("pf_testimonials").value,
+    shoots: document.getElementById("pf_shoots").value,
+    stage: document.getElementById("pf_stage").value,
+    team: document.getElementById("pf_team").value,
+    equipment: document.getElementById("pf_equipment").value,
+    notes: document.getElementById("pf_notes").value,
+    testimonial_eligible: document.getElementById("pf_testimonial_eligible").value
+  };
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
+  localStorage.setItem(PROFILE_UPDATED_KEY, new Date().toISOString());
+  document.getElementById("profileEdit").style.display = "none";
+  document.getElementById("profileView").style.display = "grid";
+  document.getElementById("profileSaveBtn").style.display = "none";
+  document.getElementById("profileToggleBtn").style.display = "inline-block";
+  renderProfileView(p);
+  renderProfileAlerts(p);
+}
+
+function toggleProfile() {
+  const p = loadProfile();
+  document.getElementById("pf_clients").value = p.clients || "";
+  document.getElementById("pf_client_count").value = p.client_count || "";
+  document.getElementById("pf_testimonials").value = p.testimonials || "";
+  document.getElementById("pf_shoots").value = p.shoots || "";
+  document.getElementById("pf_stage").value = p.stage || "Early-stage active";
+  document.getElementById("pf_team").value = p.team || "";
+  document.getElementById("pf_equipment").value = p.equipment || "";
+  document.getElementById("pf_notes").value = p.notes || "";
+  document.getElementById("pf_testimonial_eligible").value = p.testimonial_eligible || "";
+  document.getElementById("profileView").style.display = "none";
+  document.getElementById("profileEdit").style.display = "block";
+  document.getElementById("profileSaveBtn").style.display = "inline-block";
+  document.getElementById("profileToggleBtn").style.display = "none";
+}
+
+function renderProfileView(p) {
+  const items = [
+    { label: "Active Clients", value: p.client_count || 0, accent: true },
+    { label: "Testimonials", value: p.testimonials || 0, warn: parseInt(p.testimonials) === 0 },
+    { label: "Shoots Done", value: p.shoots || 0 },
+    { label: "Team Size", value: p.team || 0 },
+    { label: "Stage", value: p.stage || "-" },
+    { label: "Equipment", value: (p.equipment || "").split(",").length + " items" }
+  ];
+  document.getElementById("profileView").innerHTML = items.map(item => `
+    <div style="background:var(--surface2);border:1px solid ${item.warn ? "rgba(255,77,77,0.3)" : "var(--border)"};border-radius:7px;padding:12px 14px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${item.label}</div>
+      <div style="font-family:IBM Plex Mono,monospace;font-size:18px;color:${item.warn ? "var(--red)" : item.accent ? "var(--accent)" : "var(--text)"};font-weight:500">${item.value}</div>
+    </div>`).join("");
+}
+
+function renderProfileAlerts(p) {
+  const alerts = [];
+  if (parseInt(p.testimonials) === 0) {
+    alerts.push({ type: "red", icon: "??", msg: "Zero testimonials — request one from " + (p.testimonial_eligible || "your current clients") + " this week." });
+  }
+  if (parseInt(p.client_count) < 3) {
+    alerts.push({ type: "orange", icon: "??", msg: "Under 3 clients — content should focus on client attraction and authority positioning." });
+  }
+  const lastUpdated = localStorage.getItem(PROFILE_UPDATED_KEY);
+  if (lastUpdated) {
+    const daysSince = Math.floor((new Date() - new Date(lastUpdated)) / 86400000);
+    if (daysSince >= 30) {
+      alerts.push({ type: "accent", icon: "??", msg: "Profile not updated in " + daysSince + " days — update now so AI generates relevant ideas." });
+    }
+  }
+  document.getElementById("profileAlerts").innerHTML = alerts.map(a => `
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:6px;margin-top:8px;background:${a.type === "red" ? "var(--red-dim)" : a.type === "orange" ? "rgba(255,140,58,0.08)" : "var(--accent-dim)"};border:1px solid ${a.type === "red" ? "rgba(255,77,77,0.2)" : a.type === "orange" ? "rgba(255,140,58,0.2)" : "rgba(212,245,60,0.2)"}">
+      <span style="font-size:14px">${a.icon}</span>
+      <span style="font-size:12px;color:${a.type === "red" ? "var(--red)" : a.type === "orange" ? "var(--orange)" : "var(--accent)"};font-family:IBM Plex Mono,monospace;line-height:1.5">${a.msg}</span>
+    </div>`).join("");
+}
+
+function initProfile() {
+  const p = loadProfile();
+  renderProfileView(p);
+  renderProfileAlerts(p);
+  document.getElementById("profileStatus").textContent = "— " + (p.client_count || 0) + " clients · " + (p.shoots || 0) + " shoots";
+  // Check monthly reminder
+  const lastUpdated = localStorage.getItem(PROFILE_UPDATED_KEY);
+  if (!lastUpdated) localStorage.setItem(PROFILE_UPDATED_KEY, new Date().toISOString());
+}
+
+function getProfileContext() {
+  const p = loadProfile();
+  return `\n\nPVV COMPANY PROFILE (USE THIS TO FILTER AND PERSONALIZE IDEAS):
+- Active clients: ${p.clients} (${p.client_count} total)
+- Testimonials collected: ${p.testimonials}
+- Shoots completed: ${p.shoots}
+- Team: ${p.team} people
+- Business stage: ${p.stage}
+- Equipment: ${p.equipment}
+- Current focus: ${p.notes}
+- Clients eligible for testimonial: ${p.testimonial_eligible}
+
+CONTENT RULES BASED ON THIS PROFILE:
+- Only suggest ideas executable with the equipment listed above
+- Prioritize client attraction content since client count is low
+- ${parseInt(p.testimonials) === 0 ? "Include at least 1 testimonial-harvesting content idea" : ""}
+- All ideas must work with a ${p.team}-person team
+- Ideas should reference RGV/South Texas market specifically`;
+}
+// ---- END COMPANY PROFILE ----
+
 initPlatforms();
+initProfile();
 renderSaved();
 loadHooks();
 initTrends();
