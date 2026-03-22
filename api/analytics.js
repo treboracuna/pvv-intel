@@ -108,6 +108,67 @@ export default async function handler(req, res) {
       }
     }
 
+    // ANALYZE IMAGE — reads analytics screenshot and extracts stats
+    if (action === 'analyze_image') {
+      const { image_base64, image_type } = req.body;
+      if (!image_base64) return res.status(400).json({ error: 'No image provided' });
+
+      const aiRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                source: {
+                  type: 'base64',
+                  media_type: image_type || 'image/jpeg',
+                  data: image_base64
+                }
+              },
+              {
+                type: 'text',
+                text: `You are analyzing a social media analytics screenshot (Instagram, TikTok, or similar).
+Extract all visible metrics and return ONLY valid JSON with no markdown:
+{
+  "views": <number or null>,
+  "likes": <number or null>,
+  "comments": <number or null>,
+  "shares": <number or null>,
+  "reach": <number or null>,
+  "watch_time_pct": <number 0-100 or null>,
+  "saves": <number or null>,
+  "impressions": <number or null>,
+  "platform": "<Instagram|TikTok|YouTube|LinkedIn|unknown>",
+  "notes": "<any other useful info visible like date range, content type, or notable metrics>",
+  "raw_text": "<all numbers and labels you can read from the image>"
+}
+If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200).`
+              }
+            ]
+          }]
+        })
+      });
+
+      const aiData = await aiRes.json();
+      if (aiData.error) return res.status(500).json({ error: aiData.error.message });
+      const raw = aiData.content[0].text.trim().replace(/\`\`\`json|\`\`\`/g, '').trim();
+      try {
+        const parsed = JSON.parse(raw);
+        return res.status(200).json(parsed);
+      } catch(e) {
+        return res.status(200).json({ raw_text: raw, error: 'Could not parse structured data' });
+      }
+    }
+
     if (action === 'save') {
       const { title, platform, format, hook, posted_date, views, likes, comments, shares, watch_time_pct, reach, led_to_dm, led_to_booking, notes, reel_url } = req.body;
 
