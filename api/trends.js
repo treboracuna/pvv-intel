@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
   try {
     const braveGet = (q) =>
-      fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(q)}&count=3&freshness=pd`, {
+      fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(q)}&count=3&freshness=pd&country=us&search_lang=en&ui_lang=en-US`, {
         headers: {
           'Accept': 'application/json',
           'Accept-Encoding': 'gzip',
