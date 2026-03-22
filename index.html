@@ -541,6 +541,12 @@ footer {
 .audio-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
 .audio-artist { font-size: 11px; color: var(--muted); font-family: "IBM Plex Mono", monospace; }
 .audio-mood { font-size: 11px; color: var(--green); margin-top: 3px; font-style: italic; }
+
+.vscore-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.vscore-label { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); flex-shrink: 0; }
+.vscore-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.vscore-bar { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+.vscore-num { font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 500; flex-shrink: 0; min-width: 44px; text-align: right; }
 </style>
 </head>
 <body>
@@ -734,6 +740,7 @@ Return ONLY valid JSON. No markdown fences, no explanation, no preamble. Raw JSO
       "cta": "The exact call to action at the end",
       "why_it_performs": "2-3 sentences explaining the specific proven pattern that makes this drive inbound clients",
       "fire_factor": "HIGH or MEDIUM",
+      "viral_score": <integer 1-100 based on hook strength, emotional trigger, format performance, and conversion potential for real estate audience>
       "audio": [
         {"title": "Song Title", "artist": "Artist Name", "mood": "why it fits this video"},
         {"title": "Song Title", "artist": "Artist Name", "mood": "why it fits this video"},
@@ -814,6 +821,7 @@ function renderResults(data) {
           <span class="tag tag-accent">${escHtml(activePlat)}</span>
           <span class="tag tag-green">${escHtml(idea.format)}</span>
           ${idea.fire_factor === 'HIGH' ? '<span class="tag tag-red">🔥 High</span>' : ''}
+          ${idea.viral_score ? `<span class="tag" style="background:${idea.viral_score>=80?'rgba(46,204,138,0.15)':idea.viral_score>=60?'rgba(212,245,60,0.1)':'rgba(255,140,58,0.1)'};color:${idea.viral_score>=80?'#2ecc8a':idea.viral_score>=60?'#d4f53c':'#ff8c3a'}">⚡ ${idea.viral_score}</span>` : ''}
         </div>
         <span class="chevron">▼</span>
       </div>
@@ -839,6 +847,14 @@ function renderResults(data) {
           <div class="cblock-label">Call to Action</div>
           <div class="body-text">${escHtml(idea.cta)}</div>
         </div>
+        ${idea.viral_score ? `
+        <div class="vscore-wrap">
+          <span class="vscore-label">Viral Score</span>
+          <div class="vscore-bar-wrap">
+            <div class="vscore-bar" style="width:${idea.viral_score}%;background:${idea.viral_score>=80?'#2ecc8a':idea.viral_score>=60?'#d4f53c':'#ff8c3a'}"></div>
+          </div>
+          <span class="vscore-num" style="color:${idea.viral_score>=80?'#2ecc8a':idea.viral_score>=60?'#d4f53c':'#ff8c3a'}">${idea.viral_score}<span style="font-size:11px;color:var(--muted)">/100</span></span>
+        </div>` : ''}
         <div class="cblock">
           <div class="cblock-label">Why It Performs</div>
           <div class="why-box">${escHtml(idea.why_it_performs)}</div>
@@ -940,6 +956,7 @@ function exportAll() {
     txt += `\n--- IDEA ${i+1}: ${idea.title} ---\n`;
     txt += `Format: ${idea.format}\n`;
     txt += `Fire Factor: ${idea.fire_factor}\n`;
+    txt += `Viral Score: ${idea.viral_score || "N/A"}/100\n`;
     txt += `Hook: ${idea.hook}\n`;
     txt += `Emotional Trigger: ${idea.emotional_trigger}\n`;
     txt += `Structure:\n${idea.structure.map((s,j)=>`  ${j+1}. ${s}`).join('\n')}\n`;
