@@ -127,7 +127,7 @@ async function initLogin() {
   const sb = createClient(cfg.supabase_url, cfg.supabase_key);
   window._sb = sb;
 
-  const { data } = await sb.auth.getSession();
+  sb.auth.onAuthStateChange((event, session) => { if (session) { const dest = new URLSearchParams(window.location.search).get('redirect') || '/'; window.location.href = dest; } }); const { data } = await sb.auth.getSession();
   if (data.session) {
     const dest = new URLSearchParams(window.location.search).get('redirect') || '/';
     window.location.href = dest;

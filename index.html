@@ -9,7 +9,7 @@
   const sb = createClient(cfg.supabase_url, cfg.supabase_key);
   window._sb = sb;
 
-  const { data } = await sb.auth.getSession();
+  sb.auth.startAutoRefresh(); const { data } = await sb.auth.getSession();
   if (!data.session) {
     window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
     return;
