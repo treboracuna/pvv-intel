@@ -276,6 +276,7 @@ select option { background: var(--surface2); }
   gap: 10px;
 }
 .run-btn:hover:not(:disabled) { background: #e8ff60; }
+.run-btn:active:not(:disabled) { transform: scale(0.98); }
 .run-btn:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinner {
@@ -368,6 +369,8 @@ select option { background: var(--surface2); }
   cursor: pointer;
   user-select: none;
   gap: 12px;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 56px;
 }
 .card-num {
   font-family: 'IBM Plex Mono', monospace;
@@ -609,6 +612,110 @@ footer {
 .broll-text { font-size: 13px; color: var(--text); line-height: 1.55; }
 .broll-copy { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 12px; padding: 0 0 0 8px; flex-shrink: 0; transition: color 0.15s; margin-top: 1px; }
 .broll-copy:hover { color: var(--accent); }
+
+/* ===== MOBILE OPTIMIZATION ===== */
+@media(max-width:768px) {
+  /* Nav */
+  nav { padding: 0 16px; height: 54px; }
+  .nav-logo { font-size: 12px; }
+
+  /* Hero */
+  .hero { padding: 40px 16px 32px; }
+  .hero h1 { font-size: 28px; }
+  .hero-sub { font-size: 14px; margin-bottom: 24px; }
+  .hero-cta { padding: 12px 20px; font-size: 12px; }
+
+  /* Container */
+  .container { padding: 0 14px 60px; }
+
+  /* Platform buttons */
+  .platform-row { gap: 6px; }
+  .plat-btn { padding: 6px 12px; font-size: 10px; }
+
+  /* Panel */
+  .panel { padding: 18px 14px; }
+
+  /* Input grid — always 1 col on mobile */
+  .grid2 { grid-template-columns: 1fr !important; gap: 12px; }
+
+  /* Fields */
+  .field input, .field select, .field textarea { font-size: 16px !important; padding: 12px 12px !important; }
+
+  /* Run button */
+  .run-btn { padding: 14px; font-size: 12px; }
+
+  /* Metrics */
+  .metrics-grid { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+  .metric { padding: 12px 8px; }
+  .metric-val { font-size: 16px; }
+  .metric-label { font-size: 9px; }
+
+  /* Schedule */
+  .sched-row { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+
+  /* Cards */
+  .card-head { padding: 14px; flex-wrap: wrap; gap: 8px; }
+  .card-title { font-size: 13px; width: 100%; padding-right: 0; }
+  .card-tags { flex-wrap: wrap; gap: 5px; }
+  .card-num { display: none; }
+  .tag { font-size: 9px; padding: 2px 7px; }
+  .card-body { padding: 14px; }
+  .cblock { margin-bottom: 14px; padding-bottom: 14px; }
+  .cblock-label { font-size: 9px; }
+  .hook-box { font-size: 12px; padding: 10px 12px; }
+  .step-item { font-size: 12px; gap: 8px; }
+  .step-n { width: 18px; height: 18px; font-size: 9px; }
+  .why-box { font-size: 12px; padding: 10px 12px; }
+  .body-text { font-size: 12px; }
+
+  /* Viral score */
+  .vscore-num { font-size: 15px; }
+
+  /* B-roll */
+  .broll-item { padding: 8px 10px; }
+  .broll-text { font-size: 12px; }
+
+  /* Audio */
+  .audio-item { padding: 8px 10px; }
+  .audio-title { font-size: 12px; }
+
+  /* Calendar */
+  .cal-grid { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+  .cal-day { padding: 10px; min-height: 80px; }
+  .cal-day-name { font-size: 9px; }
+  .cal-idea-title { font-size: 11px; }
+  .cal-actions { flex-wrap: wrap; gap: 8px; }
+  .cal-action-btn { font-size: 10px; padding: 8px 14px; flex: 1; text-align: center; }
+
+  /* Intelligence */
+  .intel-grid { grid-template-columns: 1fr !important; gap: 10px; }
+  .intel-card { padding: 12px; }
+  .intel-panel { padding: 14px; }
+
+  /* Hook library */
+  .hook-search-row { flex-direction: column; gap: 8px; }
+  .hook-search-btn { width: 100%; }
+  .hook-lib-item { padding: 10px 12px; }
+  .hook-lib-text { font-size: 12px; }
+
+  /* Save/export btns */
+  .save-btn { font-size: 10px; padding: 7px 12px; }
+  .export-btn { font-size: 10px; padding: 8px 14px; width: 100%; justify-content: center; }
+
+  /* Section labels */
+  .slabel { font-size: 9px; }
+
+  /* Footer */
+  footer { padding: 20px 16px; flex-direction: column; gap: 8px; text-align: center; }
+}
+
+@media(max-width:400px) {
+  .hero h1 { font-size: 24px; }
+  .sched-row { grid-template-columns: 1fr !important; }
+  .cal-grid { grid-template-columns: 1fr !important; }
+  .metrics-grid { grid-template-columns: 1fr 1fr !important; }
+}
+/* ===== END MOBILE ===== */
 </style>
 </head>
 <body>
