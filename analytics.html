@@ -116,6 +116,16 @@ select option { background: var(--surface2); }
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+.url-row { display: flex; gap: 10px; margin-bottom: 16px; align-items: flex-end; }
+.url-input-wrap { flex: 1; }
+.fetch-btn { padding: 10px 18px; background: var(--accent); color: #000; font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap; transition: all 0.15s; flex-shrink: 0; }
+.fetch-btn:hover { background: #e8ff60; }
+.fetch-btn:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; }
+.fetch-status { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 5px; min-height: 16px; }
+.fetch-status.success { color: var(--green); }
+.fetch-status.error { color: var(--red); }
+@media(max-width:768px){ .url-row { flex-direction: column; } .fetch-btn { width: 100%; } }
 </style>
 </head>
 <body>
@@ -133,6 +143,16 @@ select option { background: var(--surface2); }
   <div class="slabel">Log a Video</div>
   <div class="panel">
     <div id="formMsg"></div>
+    <div class="url-row">
+      <div class="url-input-wrap">
+        <div class="field" style="margin-bottom:0">
+          <label>Paste Reel / TikTok URL (optional — auto-fills stats)</label>
+          <input type="url" id="v_url" placeholder="https://www.instagram.com/reel/... or https://www.tiktok.com/...">
+        </div>
+        <div class="fetch-status" id="fetchStatus"></div>
+      </div>
+      <button class="fetch-btn" id="fetchBtn" onclick="fetchUrlData()">⚡ Fetch Stats</button>
+    </div>
     <div class="grid2">
       <div class="field"><label>Video Title</label><input id="v_title" placeholder="e.g. This listing sold in 2 days"></div>
       <div class="field"><label>Platform</label>
@@ -202,6 +222,54 @@ select option { background: var(--surface2); }
 // Set default date to today
 document.getElementById('v_date').value = new Date().toISOString().slice(0,10);
 
+async function fetchUrlData() {
+  const url = document.getElementById('v_url').value.trim();
+  const platform = document.getElementById('v_platform').value;
+  if (!url) { setFetchStatus('Paste a URL first', 'error'); return; }
+
+  const btn = document.getElementById('fetchBtn');
+  btn.disabled = true;
+  btn.textContent = 'Fetching...';
+  setFetchStatus('Pulling data from URL...', '');
+
+  try {
+    const res = await fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'fetch_url', url, platform })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    // Auto-fill whatever we got
+    if (data.title && !document.getElementById('v_title').value) {
+      document.getElementById('v_title').value = data.title;
+    }
+    if (data.views) document.getElementById('v_views').value = data.views;
+    if (data.likes) document.getElementById('v_likes').value = data.likes;
+    if (data.comments) document.getElementById('v_comments').value = data.comments;
+    if (data.shares) document.getElementById('v_shares').value = data.shares;
+
+    const filled = [data.views, data.likes, data.comments, data.shares].filter(Boolean).length;
+    if (filled > 0) {
+      setFetchStatus(`✓ Auto-filled ${filled} fields from ${data.source}. Add watch time + retention manually from your dashboard.`, 'success');
+    } else {
+      setFetchStatus('Fetched but no stats found in public data. Fill manually.', 'error');
+    }
+  } catch(e) {
+    setFetchStatus('Could not fetch: ' + e.message, 'error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '⚡ Fetch Stats';
+}
+
+function setFetchStatus(msg, type) {
+  const el = document.getElementById('fetchStatus');
+  el.textContent = msg;
+  el.className = 'fetch-status' + (type ? ' ' + type : '');
+}
+
 async function saveVideo() {
   const title = document.getElementById('v_title').value.trim();
   const hook = document.getElementById('v_hook').value.trim();
@@ -216,6 +284,7 @@ async function saveVideo() {
     format: document.getElementById('v_format').value,
     hook,
     posted_date: document.getElementById('v_date').value,
+    reel_url: document.getElementById('v_url').value.trim(),
     views: document.getElementById('v_views').value,
     likes: document.getElementById('v_likes').value,
     comments: document.getElementById('v_comments').value,
@@ -272,6 +341,7 @@ async function loadVideos() {
         <div class="video-info">
           <div class="video-title">${escHtml(v.title)}</div>
           <div class="video-meta">${v.platform} · ${v.format || 'No format'} · ${v.posted_date || ''}</div>
+          ${v.reel_url ? `<a href="${v.reel_url}" target="_blank" style="font-size:11px;color:var(--accent);font-family:'IBM Plex Mono',monospace;text-decoration:none;opacity:0.7">↗ View Reel</a>` : ''}
           <div style="margin-top:6px;font-size:11px;color:var(--muted);font-style:italic">"${escHtml(v.hook)}"</div>
           <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
             ${v.led_to_dm ? '<span class="tag tag-green">DM</span>' : ''}
@@ -353,7 +423,7 @@ function showMsg(msg, type) {
 }
 
 function clearForm() {
-  ['v_title','v_format','v_hook','v_views','v_likes','v_comments','v_shares','v_reach','v_watch','v_notes'].forEach(id => {
+  ['v_url','v_title','v_format','v_hook','v_views','v_likes','v_comments','v_shares','v_reach','v_watch','v_notes'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('v_dm').checked = false;

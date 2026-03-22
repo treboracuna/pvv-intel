@@ -1,3 +1,75 @@
+// ============================================================
+// DATA FETCHER — swap braveSearch for apifyFetch when ready
+// ============================================================
+
+async function braveSearch(url, platform) {
+  const BRAVE_KEY = process.env.BRAVE_API_KEY;
+  if (!BRAVE_KEY) throw new Error('BRAVE_API_KEY not set');
+
+  const query = `site:${new URL(url).hostname} ${url}`;
+  const r = await fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(url)}&count=5`, {
+    headers: {
+      'Accept': 'application/json',
+      'Accept-Encoding': 'gzip',
+      'X-Subscription-Token': BRAVE_KEY
+    }
+  });
+  const data = await r.json();
+  const result = (data.web?.results || [])[0] || {};
+
+  // Parse whatever we can from the snippet
+  const snippet = result.description || result.title || '';
+  const views = extractNumber(snippet, ['views', 'plays', 'watch']) || 0;
+  const likes = extractNumber(snippet, ['likes', 'hearts']) || 0;
+  const comments = extractNumber(snippet, ['comments', 'replies']) || 0;
+  const shares = extractNumber(snippet, ['shares', 'reposts', 'retweets']) || 0;
+
+  return {
+    title: result.title || '',
+    snippet,
+    views, likes, comments, shares,
+    source: 'brave',
+    raw_url: url
+  };
+}
+
+// APIFY STUB — uncomment and fill in when switching
+// async function apifyFetch(url, platform) {
+//   const APIFY_KEY = process.env.APIFY_API_KEY;
+//   const actorId = platform === 'TikTok' ? 'clockworks~tiktok-scraper' : 'apify~instagram-scraper';
+//   const r = await fetch(`https://api.apify.com/v2/acts/${actorId}/run-sync-get-dataset-items?token=${APIFY_KEY}`, {
+//     method: 'POST',
+//     headers: { 'Content-Type': 'application/json' },
+//     body: JSON.stringify({ directUrls: [url], resultsType: 'posts', maxPostsPerQuery: 1 })
+//   });
+//   const [item] = await r.json();
+//   return {
+//     title: item.text || item.caption || '',
+//     views: item.playCount || item.videoPlayCount || 0,
+//     likes: item.likesCount || item.diggCount || 0,
+//     comments: item.commentsCount || 0,
+//     shares: item.sharesCount || item.repostCount || 0,
+//     watch_time_pct: item.avgWatchTime || 0,
+//     source: 'apify',
+//     raw_url: url
+//   };
+// }
+
+function extractNumber(text, keywords) {
+  for (const kw of keywords) {
+    const match = text.match(new RegExp(`([\d,.]+)\s*k?m?\s*${kw}`, 'i')) ||
+                  text.match(new RegExp(`${kw}[:\s]+([\d,.]+)k?m?`, 'i'));
+    if (match) {
+      let n = parseFloat(match[1].replace(/,/g, ''));
+      if (/k/i.test(match[0])) n *= 1000;
+      if (/m/i.test(match[0])) n *= 1000000;
+      return Math.round(n);
+    }
+  }
+  return null;
+}
+// ============================================================
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
@@ -22,9 +94,22 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { action } = req.body;
 
-    // Create table if needed via RPC — we use insert and let Supabase handle it
+    // FETCH URL — pulls public data from a reel/post URL
+    // TO SWITCH TO APIFY: replace the braveSearch() function below with apifyFetch()
+    if (action === 'fetch_url') {
+      const { url, platform } = req.body;
+      if (!url) return res.status(400).json({ error: 'No URL provided' });
+
+      try {
+        const data = await braveSearch(url, platform);
+        return res.status(200).json(data);
+      } catch (e) {
+        return res.status(500).json({ error: e.message });
+      }
+    }
+
     if (action === 'save') {
-      const { title, platform, format, hook, posted_date, views, likes, comments, shares, watch_time_pct, reach, led_to_dm, led_to_booking, notes } = req.body;
+      const { title, platform, format, hook, posted_date, views, likes, comments, shares, watch_time_pct, reach, led_to_dm, led_to_booking, notes, reel_url } = req.body;
 
       const payload = {
         title, platform, format, hook, posted_date,
@@ -37,6 +122,7 @@ export default async function handler(req, res) {
         led_to_dm: led_to_dm === true || led_to_dm === 'true',
         led_to_booking: led_to_booking === true || led_to_booking === 'true',
         notes: notes || '',
+        reel_url: reel_url || '',
         created_at: new Date().toISOString()
       };
 
