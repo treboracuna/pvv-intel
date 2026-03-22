@@ -547,6 +547,21 @@ footer {
 .vscore-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
 .vscore-bar { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
 .vscore-num { font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 500; flex-shrink: 0; min-width: 44px; text-align: right; }
+
+.hook-lib-wrap { margin-top: 28px; }
+.hook-search-row { display: flex; gap: 10px; margin-bottom: 16px; }
+.hook-search-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 10px 14px; border-radius: 5px; outline: none; transition: border-color 0.15s; }
+.hook-search-input:focus { border-color: var(--accent); }
+.hook-search-btn { padding: 10px 18px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 5px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.hook-search-btn:hover { border-color: var(--accent); color: var(--accent); }
+.hook-lib-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; transition: border-color 0.15s; }
+.hook-lib-item:hover { border-color: var(--accent); }
+.hook-lib-text { flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--accent); line-height: 1.5; }
+.hook-lib-meta { font-size: 10px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+.hook-lib-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; padding: 0; transition: color 0.15s; flex-shrink: 0; }
+.hook-lib-del:hover { color: var(--red); }
+.hook-empty { font-size: 13px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; padding: 20px 0; text-align: center; }
+.hook-count { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); margin-left: 8px; }
 </style>
 </head>
 <body>
@@ -635,6 +650,20 @@ footer {
     <div id="savedList"></div>
   </div>
 
+</div>
+
+<!-- HOOK LIBRARY -->
+<div class="container" id="hookLibContainer" style="padding-top:0">
+  <div id="hookLibWrap" style="display:none">
+    <div class="slabel">Hook Library <span id="hookCountBadge"></span></div>
+    <div class="hook-lib-wrap">
+      <div class="hook-search-row">
+        <input class="hook-search-input" id="hookSearchInput" placeholder="Search hooks..." oninput="filterHooks()">
+        <button class="hook-search-btn" onclick="loadHooks()">↺ Refresh</button>
+      </div>
+      <div id="hookLibList"></div>
+    </div>
+  </div>
 </div>
 
 <!-- FOOTER -->
@@ -916,6 +945,80 @@ function saveIdea(i) {
   saved.push({ title: idea.title, platform: activePlat, format: idea.format, hook: idea.hook });
   try { localStorage.setItem('pvv_saved', JSON.stringify(saved)); } catch {}
   renderSaved();
+  // Save hook to Supabase library
+  saveHookToLibrary(idea.hook, activePlat, idea.format, idea.viral_score || null, idea.title);
+}
+
+async function saveHookToLibrary(hook, platform, format, viral_score, title) {
+  try {
+    await fetch('/api/hooks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'save', hook, platform, format, viral_score, title })
+    });
+    loadHooks();
+  } catch(e) {}
+}
+
+let allHooks = [];
+
+async function loadHooks() {
+  try {
+    const res = await fetch('/api/hooks');
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+    allHooks = data;
+    renderHooks(allHooks);
+    if (allHooks.length > 0) {
+      document.getElementById('hookLibWrap').style.display = 'block';
+      document.getElementById('hookCountBadge').textContent = allHooks.length + ' saved';
+    }
+  } catch(e) {}
+}
+
+function filterHooks() {
+  const q = document.getElementById('hookSearchInput').value.toLowerCase();
+  const filtered = q ? allHooks.filter(h =>
+    (h.hook||'').toLowerCase().includes(q) ||
+    (h.platform||'').toLowerCase().includes(q) ||
+    (h.format||'').toLowerCase().includes(q) ||
+    (h.title||'').toLowerCase().includes(q)
+  ) : allHooks;
+  renderHooks(filtered);
+}
+
+function renderHooks(hooks) {
+  const list = document.getElementById('hookLibList');
+  if (!hooks.length) {
+    list.innerHTML = '<div class="hook-empty">No hooks found. Save ideas to build your library.</div>';
+    return;
+  }
+  list.innerHTML = hooks.map((h, i) => `
+    <div class="hook-lib-item" onclick="copyHook('${escHtml(h.hook).replace(/'/g,"\'")}')">
+      <div style="flex:1">
+        <div class="hook-lib-text">"${escHtml(h.hook)}"</div>
+        <div class="hook-lib-meta">${escHtml(h.platform)} · ${escHtml(h.format||'—')} ${h.viral_score ? '· ⚡' + h.viral_score : ''}</div>
+      </div>
+      <button class="hook-lib-del" onclick="event.stopPropagation();deleteHook('${h.id}')">✕</button>
+    </div>`).join('');
+}
+
+function copyHook(hook) {
+  navigator.clipboard.writeText(hook).then(() => {
+    const orig = event.currentTarget.querySelector('.hook-lib-text');
+    if (orig) { const t = orig.textContent; orig.textContent = '✓ Copied!'; setTimeout(() => orig.textContent = t, 1500); }
+  }).catch(() => {});
+}
+
+async function deleteHook(id) {
+  try {
+    await fetch('/api/hooks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', id })
+    });
+    loadHooks();
+  } catch(e) {}
 }
 
 function deleteIdea(i) {
@@ -976,6 +1079,7 @@ function escHtml(str) {
 
 initPlatforms();
 renderSaved();
+loadHooks();
 </script>
 </body>
 </html>
