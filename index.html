@@ -562,6 +562,29 @@ footer {
 .hook-lib-del:hover { color: var(--red); }
 .hook-empty { font-size: 13px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; padding: 20px 0; text-align: center; }
 .hook-count { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); margin-left: 8px; }
+
+.cal-wrap { margin-bottom: 28px; }
+.cal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px; }
+@media(max-width:600px){ .cal-grid { grid-template-columns: 1fr; } }
+.cal-day { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; min-height: 120px; transition: border-color 0.2s; }
+.cal-day.has-content { border-color: var(--border2); }
+.cal-day.today { border-color: rgba(212,245,60,0.3); }
+.cal-day.today .cal-day-name { color: var(--accent); }
+.cal-day-name { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.cal-day-date { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+.cal-idea-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 8px 10px; }
+.cal-idea-title { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 5px; }
+.cal-idea-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
+.cal-idea-score { font-family: 'IBM Plex Mono', monospace; font-size: 10px; }
+.cal-post-btn { width: 100%; margin-top: 8px; padding: 5px; background: transparent; border: 1px solid var(--border2); color: var(--muted); font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 4px; cursor: pointer; transition: all 0.15s; }
+.cal-post-btn:hover { border-color: var(--green); color: var(--green); }
+.cal-post-btn.done { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.cal-empty { font-size: 11px; color: var(--muted); font-style: italic; }
+.cal-actions { display: flex; gap: 10px; }
+.cal-action-btn { padding: 9px 18px; background: transparent; border: 1px solid var(--border2); color: var(--muted); font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 5px; cursor: pointer; transition: all 0.15s; }
+.cal-action-btn:hover { border-color: var(--accent); color: var(--accent); }
+.cal-action-btn.cal-primary { background: var(--accent); color: #000; border-color: var(--accent); }
+.cal-action-btn.cal-primary:hover { background: #e8ff60; }
 </style>
 </head>
 <body>
@@ -643,6 +666,18 @@ footer {
 
   <!-- RESULTS -->
   <div id="results" style="display:none"></div>
+
+  <!-- CALENDAR -->
+  <div id="calWrap" style="display:none">
+    <div class="slabel">Content Calendar <span id="calWeekLabel"></span></div>
+    <div class="cal-wrap">
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-actions">
+        <button class="cal-action-btn cal-primary" onclick="scheduleAll()">📅 Schedule All Ideas</button>
+        <button class="cal-action-btn" onclick="clearCalendar()">✕ Clear</button>
+      </div>
+    </div>
+  </div>
 
   <!-- SAVED -->
   <div id="savedWrap" style="display:none">
@@ -808,6 +843,7 @@ Rules:
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
     window._trendUsed = data._trend_data_used || false;
+    window._lastPatterns = currentData ? currentData.patterns : null;
     const raw = data.content[0].text.trim().replace(/```json|```/g, '').trim();
     currentData = JSON.parse(raw);
     renderResults(currentData);
@@ -931,6 +967,7 @@ function renderResults(data) {
     el.prepend(badge);
   }
   renderSaved();
+  initCalendar(data.ideas);
 }
 
 function toggleCard(i) {
@@ -1076,6 +1113,96 @@ function exportAll() {
 function escHtml(str) {
   return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+
+// ---- CONTENT CALENDAR ----
+const CAL_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+let calState = {};
+let calIdeas = [];
+
+function getNextWeekDates() {
+  const today = new Date();
+  const dow = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+  return CAL_DAYS.map((d, i) => {
+    const dt = new Date(monday);
+    dt.setDate(monday.getDate() + i);
+    return {
+      day: d,
+      date: dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      iso: dt.toISOString().slice(0,10),
+      isToday: dt.toDateString() === today.toDateString()
+    };
+  });
+}
+
+function initCalendar(ideas) {
+  calIdeas = ideas || [];
+  document.getElementById('calWrap').style.display = 'block';
+  const dates = getNextWeekDates();
+  document.getElementById('calWeekLabel').textContent = `— Week of ${dates[0].date}`;
+  renderCalendar();
+}
+
+function scheduleAll() {
+  if (!calIdeas.length) return;
+  const dates = getNextWeekDates();
+  calState = {};
+  const bestDays = (window._lastPatterns && window._lastPatterns.best_posting_days) || [];
+  const orderedDays = bestDays.length >= 2
+    ? [...bestDays, ...CAL_DAYS.filter(d => !bestDays.includes(d))]
+    : CAL_DAYS;
+  calIdeas.forEach((idea, i) => {
+    const dayName = orderedDays[i % 5];
+    const dayData = dates.find(d => d.day === dayName) || dates[i % 5];
+    if (!calState[dayData.iso]) calState[dayData.iso] = [];
+    calState[dayData.iso].push({ title: idea.title, format: idea.format, viral_score: idea.viral_score, hook: idea.hook, posted: false });
+  });
+  try { localStorage.setItem('pvv_calendar', JSON.stringify(calState)); } catch {}
+  renderCalendar();
+}
+
+function clearCalendar() {
+  calState = {};
+  try { localStorage.setItem('pvv_calendar', JSON.stringify(calState)); } catch {}
+  renderCalendar();
+}
+
+function markPosted(iso, idx) {
+  if (!calState[iso]) return;
+  calState[iso][idx].posted = !calState[iso][idx].posted;
+  try { localStorage.setItem('pvv_calendar', JSON.stringify(calState)); } catch {}
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const dates = getNextWeekDates();
+  const grid = document.getElementById('calGrid');
+  if (!grid) return;
+  grid.innerHTML = dates.map(d => {
+    const ideas = calState[d.iso] || [];
+    const hasContent = ideas.length > 0;
+    return `<div class="cal-day${d.isToday ? ' today' : ''}${hasContent ? ' has-content' : ''}">
+      <div class="cal-day-name">${d.day}${d.isToday ? ' · Today' : ''}</div>
+      <div class="cal-day-date">${d.date}</div>
+      ${ideas.length ? ideas.map((idea, idx) => `
+        <div class="cal-idea-card">
+          <div class="cal-idea-title">${escHtml(idea.title)}</div>
+          <div class="cal-idea-tags">
+            <span class="tag tag-green" style="font-size:9px">${escHtml(idea.format||'')}</span>
+            ${idea.viral_score ? `<span class="cal-idea-score" style="color:${idea.viral_score>=80?'#2ecc8a':idea.viral_score>=60?'#d4f53c':'#ff8c3a'}">⚡${idea.viral_score}</span>` : ''}
+          </div>
+          <button class="cal-post-btn${idea.posted?' done':''}" onclick="markPosted('${d.iso}',${idx})">
+            ${idea.posted ? '✓ Posted' : 'Mark as Posted'}
+          </button>
+        </div>`).join('') : '<div class="cal-empty">No content scheduled</div>'}
+    </div>`;
+  }).join('');
+}
+
+try { calState = JSON.parse(localStorage.getItem('pvv_calendar') || '{}'); } catch { calState = {}; }
+// ---- END CALENDAR ----
 
 initPlatforms();
 renderSaved();
