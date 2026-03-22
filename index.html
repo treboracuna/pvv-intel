@@ -716,6 +716,18 @@ footer {
   .metrics-grid { grid-template-columns: 1fr 1fr !important; }
 }
 /* ===== END MOBILE ===== */
+
+.script-wrap { display: flex; flex-direction: column; gap: 10px; }
+.script-section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+.script-hook { background: var(--surface2); border-left: 3px solid var(--accent); padding: 12px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--accent); border-radius: 0 5px 5px 0; line-height: 1.55; position: relative; }
+.script-body-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; font-size: 13px; color: var(--text); line-height: 1.55; display: flex; gap: 10px; align-items: flex-start; }
+.script-line-num { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); flex-shrink: 0; min-width: 20px; margin-top: 2px; }
+.script-cta { background: rgba(46,204,138,0.08); border: 1px solid rgba(46,204,138,0.2); border-radius: 6px; padding: 12px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--green); line-height: 1.55; }
+.script-copy-all { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 7px 14px; background: transparent; border: 1px solid var(--border2); color: var(--muted); font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 5px; cursor: pointer; transition: all 0.15s; }
+.script-copy-all:hover { border-color: var(--accent); color: var(--accent); }
+@media(max-width:768px) {
+  .script-hook, .script-cta, .script-body-item { font-size: 12px; padding: 10px 12px; }
+}
 </style>
 </head>
 <body>
@@ -937,6 +949,7 @@ Return ONLY valid JSON. No markdown fences, no explanation, no preamble. Raw JSO
       "cta": "The exact call to action at the end",
       "why_it_performs": "2-3 sentences explaining the specific proven pattern that makes this drive inbound clients",
       "broll": ["Shot 1: exact description of what to film and how", "Shot 2: exact description", "Shot 3: exact description", "Shot 4: exact description", "Shot 5: exact description"],
+      "script": {"hook_line": "Exact word-for-word opening line spoken on camera or as voiceover", "body": ["Line 1 of script body", "Line 2 — build on hook, deliver value or proof", "Line 3 — reinforce with specific detail or stat", "Line 4 — transition to offer"], "cta_line": "Exact closing line spoken on camera — drives the action"}
       "fire_factor": "HIGH or MEDIUM",
       "momentum_signal": "RISING or PEAKED or EMERGING",
       "best_post_time": "e.g. Tuesday 7-9PM",
@@ -1073,6 +1086,29 @@ function renderResults(data) {
             </div>`).join('')}
           </div>
         </div>` : ''}
+        ${idea.script ? `
+        <div class="cblock">
+          <div class="cblock-label">📝 Video Script</div>
+          <div class="script-wrap">
+            <div>
+              <div class="script-section-label">Hook — Say This First</div>
+              <div class="script-hook">${escHtml(idea.script.hook_line)}</div>
+            </div>
+            <div>
+              <div class="script-section-label">Body</div>
+              ${(idea.script.body || []).map((line, j) => `
+                <div class="script-body-item" style="margin-bottom:6px">
+                  <span class="script-line-num">L${j+1}</span>
+                  <span>${escHtml(line)}</span>
+                </div>`).join('')}
+            </div>
+            <div>
+              <div class="script-section-label">Call to Action — Close With This</div>
+              <div class="script-cta">${escHtml(idea.script.cta_line)}</div>
+            </div>
+            <button class="script-copy-all" onclick="copyScript(${i})">📋 Copy Full Script</button>
+          </div>
+        </div>` : ''}
         ${(idea.audio && idea.audio.length) ? `
         <div class="cblock">
           <div class="cblock-label">🎵 Recommended Audio</div>
@@ -1140,6 +1176,27 @@ function renderResults(data) {
 function toggleCard(i) {
   const c = document.getElementById('card_' + i);
   if (c) c.classList.toggle('open');
+}
+
+function copyScript(i) {
+  if (!currentData) return;
+  const idea = currentData.ideas[i];
+  if (!idea.script) return;
+  const s = idea.script;
+  const full = [
+    'HOOK:',
+    s.hook_line,
+    '',
+    'BODY:',
+    ...(s.body || []).map((l, j) => `L${j+1}: ${l}`),
+    '',
+    'CTA:',
+    s.cta_line
+  ].join('\n');
+  navigator.clipboard.writeText(full).then(() => {
+    const btn = document.querySelector(`#card_${i} .script-copy-all`);
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy Full Script', 2000); }
+  }).catch(() => {});
 }
 
 function saveIdea(i) {
@@ -1295,6 +1352,11 @@ function exportAll() {
     txt += `CTA: ${idea.cta}\n`;
     txt += `Why It Performs: ${idea.why_it_performs}\n`;
     if (idea.broll && idea.broll.length) { txt += `B-Roll Shots:\n${idea.broll.map((s,i)=>`  S${i+1}. ${s}`).join('\n')}\n`; }
+    if (idea.script) {
+      txt += `Script:\n  Hook: ${idea.script.hook_line}\n`;
+      (idea.script.body||[]).forEach((l,j) => { txt += `  L${j+1}: ${l}\n`; });
+      txt += `  CTA: ${idea.script.cta_line}\n`;
+    }
   });
   const blob = new Blob([txt], { type: 'text/plain' });
   const a = document.createElement('a');
