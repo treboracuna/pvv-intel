@@ -170,7 +170,7 @@ If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200).
     }
 
     if (action === 'save') {
-      const { title, platform, format, hook, posted_date, views, likes, comments, shares, watch_time_pct, reach, led_to_dm, led_to_booking, notes, reel_url } = req.body;
+      const { title, platform, format, hook, posted_date, views, likes, comments, shares, watch_time_pct, reach, led_to_dm, led_to_booking, notes, reel_url, account } = req.body;
 
       const payload = {
         title, platform, format, hook, posted_date,
@@ -184,6 +184,7 @@ If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200).
         led_to_booking: led_to_booking === true || led_to_booking === 'true',
         notes: notes || '',
         reel_url: reel_url || '',
+        account: account || 'PVV',
         created_at: new Date().toISOString()
       };
 
@@ -198,7 +199,9 @@ If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200).
 
     // Analyze patterns
     if (action === 'analyze') {
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/pvv_videos?select=*&order=views.desc`, {
+      const { account: analyzeAccount } = req.body;
+      const acctFilter = analyzeAccount && analyzeAccount !== 'ALL' ? `&account=eq.${encodeURIComponent(analyzeAccount)}` : '';
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/pvv_videos?select=*&order=views.desc${acctFilter}`, {
         headers
       });
       const videos = await r.json();
@@ -211,7 +214,10 @@ If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200).
         `Title: ${v.title} | Platform: ${v.platform} | Format: ${v.format} | Hook: ${v.hook} | Views: ${v.views} | Likes: ${v.likes} | Shares: ${v.shares} | Watch Time: ${v.watch_time_pct}% | Led to DM: ${v.led_to_dm} | Led to Booking: ${v.led_to_booking}`
       ).join('\n');
 
-      const prompt = `You are analyzing content performance data for Prestige Valley Visuals (PVV), a real estate video production company in the Rio Grande Valley, Texas.
+      const acctName = req.body.account || 'PVV';
+      const acctDescriptions = { 'PVV': 'Prestige Valley Visuals — real estate video production company in RGV, Texas', 'Texaswide Insurance': 'Texaswide Insurance — insurance services content', 'Exclusiva': 'Exclusiva Homes / Alexandra Properties — commercial real estate development' };
+      const acctDesc = acctDescriptions[acctName] || acctName;
+      const prompt = `You are analyzing content performance data for ${acctDesc}.
 
 Here is their complete video performance history:
 ${summary}
@@ -252,7 +258,9 @@ Analyze this data and return ONLY valid JSON:
 
   // GET — fetch all videos
   if (req.method === 'GET') {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/pvv_videos?select=*&order=created_at.desc`, {
+    const account = req.query?.account || req.headers['x-account'] || 'PVV';
+    const accountFilter = account === 'ALL' ? '' : `&account=eq.${encodeURIComponent(account)}`;
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/pvv_videos?select=*&order=created_at.desc${accountFilter}`, {
       headers
     });
     const d = await r.json();

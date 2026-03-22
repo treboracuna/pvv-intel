@@ -141,6 +141,13 @@ select option { background: var(--surface2); }
 .img-status.success { color: var(--green); }
 .img-status.error { color: var(--red); }
 @media(max-width:768px){ .img-drop-zone { padding: 16px; } }
+
+.acct-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.acct-tab { padding: 9px 20px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; border-radius: 6px; transition: all 0.15s; }
+.acct-tab:hover { border-color: var(--border2); color: var(--text); }
+.acct-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+.acct-badge { display: inline-flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(212,245,60,0.2); padding: 4px 12px; border-radius: 20px; margin-bottom: 20px; }
+@media(max-width:768px){ .acct-tabs { gap: 6px; } .acct-tab { padding: 8px 14px; font-size: 10px; } }
 </style>
 </head>
 <body>
@@ -152,11 +159,22 @@ select option { background: var(--surface2); }
   </div>
 </nav>
 
+<div style="background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px">
+  <div style="max-width:1060px;margin:0 auto;padding:14px 0">
+    <div class="acct-tabs" id="acctTabs">
+      <button class="acct-tab active" onclick="switchAccount('PVV', this)">📹 PVV</button>
+      <button class="acct-tab" onclick="switchAccount('Texaswide Insurance', this)">🛡️ Texaswide Insurance</button>
+      <button class="acct-tab" onclick="switchAccount('Exclusiva', this)">🏗️ Exclusiva / Alexandra's</button>
+    </div>
+  </div>
+</div>
+
 <div class="container">
 
   <!-- LOG VIDEO -->
   <div class="slabel">Log a Video</div>
   <div class="panel">
+    <div class="acct-badge" id="acctBadge">📹 PVV</div>
     <div id="formMsg"></div>
     <div class="url-row">
       <div class="url-input-wrap">
@@ -389,6 +407,21 @@ function setFetchStatus(msg, type) {
   el.className = 'fetch-status' + (type ? ' ' + type : '');
 }
 
+let currentAccount = 'PVV';
+
+function switchAccount(account, btn) {
+  currentAccount = account;
+  document.querySelectorAll('.acct-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const icons = { 'PVV': '📹', 'Texaswide Insurance': '🛡️', 'Exclusiva': '🏗️' };
+  document.getElementById('acctBadge').textContent = (icons[account] || '📊') + ' ' + account;
+  // Clear results and reload for this account
+  document.getElementById('logWrap').style.display = 'none';
+  document.getElementById('statsWrap').style.display = 'none';
+  document.getElementById('sauceWrap').style.display = 'none';
+  loadVideos();
+}
+
 async function saveVideo() {
   const title = document.getElementById('v_title').value.trim();
   const hook = document.getElementById('v_hook').value.trim();
@@ -403,6 +436,7 @@ async function saveVideo() {
     format: document.getElementById('v_format').value,
     hook,
     posted_date: document.getElementById('v_date').value,
+    account: currentAccount,
     reel_url: document.getElementById('v_url').value.trim(),
     views: document.getElementById('v_views').value,
     likes: document.getElementById('v_likes').value,
@@ -432,7 +466,7 @@ async function saveVideo() {
 
 async function loadVideos() {
   try {
-    const res = await fetch('/api/analytics');
+    const res = await fetch('/api/analytics', { headers: { 'x-account': currentAccount } });
     const videos = await res.json();
     if (!Array.isArray(videos) || videos.length === 0) return;
 
@@ -482,7 +516,7 @@ async function runAnalysis() {
     const res = await fetch('/api/analytics', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'analyze' })
+      body: JSON.stringify({ action: 'analyze', account: currentAccount })
     });
     const data = await res.json();
 
