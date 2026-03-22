@@ -602,6 +602,13 @@ footer {
 .momentum-emerging { background: rgba(212,245,60,0.1); color: #d4f53c; }
 .momentum-peaked { background: rgba(255,140,58,0.1); color: #ff8c3a; }
 .time-badge { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(212,245,60,0.15); padding: 3px 10px; border-radius: 4px; display: inline-block; margin-top: 5px; }
+
+.broll-list { display: flex; flex-direction: column; gap: 8px; }
+.broll-item { display: flex; gap: 12px; align-items: flex-start; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; }
+.broll-num { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); font-weight: 500; flex-shrink: 0; min-width: 24px; margin-top: 1px; }
+.broll-text { font-size: 13px; color: var(--text); line-height: 1.55; }
+.broll-copy { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 12px; padding: 0 0 0 8px; flex-shrink: 0; transition: color 0.15s; margin-top: 1px; }
+.broll-copy:hover { color: var(--accent); }
 </style>
 </head>
 <body>
@@ -685,7 +692,7 @@ footer {
   <div id="results" style="display:none"></div>
 
   <!-- CALENDAR -->
-  <div id="calWrap">
+  <div id="calWrap" style="display:none">
     <div class="slabel">Content Calendar <span id="calWeekLabel"></span></div>
     <div class="cal-wrap">
       <div class="cal-grid" id="calGrid"></div>
@@ -697,7 +704,7 @@ footer {
   </div>
 
   <!-- SAVED -->
-  <div id="savedWrap">
+  <div id="savedWrap" style="display:none">
     <div class="slabel">Saved Ideas</div>
     <div id="savedList"></div>
   </div>
@@ -706,7 +713,7 @@ footer {
 
 <!-- HOOK LIBRARY -->
 <div class="container" id="hookLibContainer" style="padding-top:0">
-  <div id="hookLibWrap">
+  <div id="hookLibWrap" style="display:none">
     <div class="slabel">Hook Library <span id="hookCountBadge"></span></div>
     <div class="hook-lib-wrap">
       <div class="hook-search-row">
@@ -822,6 +829,7 @@ Return ONLY valid JSON. No markdown fences, no explanation, no preamble. Raw JSO
       "structure": ["step 1","step 2","step 3","step 4","step 5"],
       "cta": "The exact call to action at the end",
       "why_it_performs": "2-3 sentences explaining the specific proven pattern that makes this drive inbound clients",
+      "broll": ["Shot 1: exact description of what to film and how", "Shot 2: exact description", "Shot 3: exact description", "Shot 4: exact description", "Shot 5: exact description"],
       "fire_factor": "HIGH or MEDIUM",
       "momentum_signal": "RISING or PEAKED or EMERGING",
       "best_post_time": "e.g. Tuesday 7-9PM",
@@ -947,6 +955,17 @@ function renderResults(data) {
           <div class="cblock-label">Why It Performs</div>
           <div class="why-box">${escHtml(idea.why_it_performs)}</div>
         </div>
+        ${(idea.broll && idea.broll.length) ? `
+        <div class="cblock">
+          <div class="cblock-label">🎬 B-Roll Shot List</div>
+          <div class="broll-list">${(idea.broll || []).map((shot, j) => `
+            <div class="broll-item">
+              <span class="broll-num">S${j+1}</span>
+              <span class="broll-text">${escHtml(shot)}</span>
+              <button class="broll-copy" onclick="navigator.clipboard.writeText('${escHtml(shot).replace(/'/g,"\'")}');this.textContent='✓';setTimeout(()=>this.textContent='⧉',1200)" title="Copy">⧉</button>
+            </div>`).join('')}
+          </div>
+        </div>` : ''}
         ${(idea.audio && idea.audio.length) ? `
         <div class="cblock">
           <div class="cblock-label">🎵 Recommended Audio</div>
@@ -1047,8 +1066,10 @@ async function loadHooks() {
     if (!Array.isArray(data)) return;
     allHooks = data;
     renderHooks(allHooks);
-    document.getElementById('hookLibWrap').style.display = 'block';
-    document.getElementById('hookCountBadge').textContent = allHooks.length > 0 ? allHooks.length + ' saved' : '';
+    if (allHooks.length > 0) {
+      document.getElementById('hookLibWrap').style.display = 'block';
+      document.getElementById('hookCountBadge').textContent = allHooks.length + ' saved';
+    }
   } catch(e) {}
 }
 
@@ -1131,6 +1152,7 @@ function renderIntelligence(patterns) {
 function renderSaved() {
   const wrap = document.getElementById('savedWrap');
   const list = document.getElementById('savedList');
+  if (!saved.length) { wrap.style.display = 'none'; return; }
   wrap.style.display = 'block';
   list.innerHTML = saved.map((s, i) => `
     <div class="saved-item">
@@ -1165,6 +1187,7 @@ function exportAll() {
     txt += `Structure:\n${idea.structure.map((s,j)=>`  ${j+1}. ${s}`).join('\n')}\n`;
     txt += `CTA: ${idea.cta}\n`;
     txt += `Why It Performs: ${idea.why_it_performs}\n`;
+    if (idea.broll && idea.broll.length) { txt += `B-Roll Shots:\n${idea.broll.map((s,i)=>`  S${i+1}. ${s}`).join('\n')}\n`; }
   });
   const blob = new Blob([txt], { type: 'text/plain' });
   const a = document.createElement('a');
@@ -1265,12 +1288,6 @@ function renderCalendar() {
 }
 
 try { calState = JSON.parse(localStorage.getItem('pvv_calendar') || '{}'); } catch { calState = {}; }
-if (Object.keys(calState).length > 0) {
-  document.getElementById('calWrap').style.display = 'block';
-  const dates = getNextWeekDates();
-  document.getElementById('calWeekLabel').textContent = '— Week of ' + dates[0].date;
-  renderCalendar();
-}
 // ---- END CALENDAR ----
 
 initPlatforms();
