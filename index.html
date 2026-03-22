@@ -970,11 +970,18 @@ Return ONLY valid JSON. No markdown fences, no explanation, no preamble. Raw JSO
   }
 }
 
-Rules:
+CRITICAL RULES — every single idea MUST include ALL fields or the response is invalid:
+- broll: REQUIRED — exactly 5 specific shots described in detail. Never skip this.
+- script: REQUIRED — hook_line, 4 body lines, and cta_line. Word for word. Never skip this.
+- viral_score: REQUIRED — integer 1-100
+- momentum_signal: REQUIRED — RISING, PEAKED, or EMERGING
+- best_post_time: REQUIRED — specific day and time window
+- audio: REQUIRED — exactly 3 songs with title, artist, and mood
 - Every idea must be executable with a smartphone and existing footage only
 - Every hook must be specific, not generic
 - Every idea must directly attract paying real estate clients
-- No theory, no filler`;
+- No theory, no filler
+- Do NOT skip any field. A response missing broll or script is WRONG.`;
 
   try {
     const res = await fetch('/api/generate', {
