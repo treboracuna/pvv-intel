@@ -1919,9 +1919,13 @@ async function fetchTrends() {
   btn.classList.add('loading');
   btn.textContent = '↺ Loading...';
   const niche = getCurrentNiche();
-  const cacheKey = getTrendCacheKey(niche);
+  const platform = activePlat || 'Instagram Reels';
+  const cacheKey = getTrendCacheKey(niche + '_' + platform);
   try {
-    const url = '/api/trends' + (niche ? '?niche=' + encodeURIComponent(niche) : '');
+    const params = new URLSearchParams();
+    if (niche) params.set('niche', niche);
+    params.set('platform', platform);
+    const url = '/api/trends?' + params.toString();
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('API error');
     const data = await resp.json();

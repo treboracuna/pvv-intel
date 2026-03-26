@@ -11,8 +11,25 @@ export default async function handler(req, res) {
   if (!BRAVE_KEY) return res.status(500).json({ error: 'Brave API key not configured' });
   if (!ANTHROPIC_KEY) return res.status(500).json({ error: 'Anthropic API key not configured' });
 
-  const niche = (req.query.niche || '').trim();
-  const nicheLabel = niche || 'general viral social media';
+  const niche = (req.query.niche || 'video production').trim();
+  const plat = (req.query.platform || 'Instagram Reels').trim();
+  const nicheLabel = `${niche} — ${plat}`;
+
+  // Filter out non-content-creation results
+  const BLOCKED_DOMAINS_SUFFIX = ['.ca'];
+  const BLOCKED_KEYWORDS = ['market report', 'housing supply', 'mortgage', 'canadian', 'statistics', 'housing market', 'real estate market', 'interest rate', 'home prices', 'home sales'];
+
+  function isRelevant(item) {
+    const url = (item.url || '').toLowerCase();
+    const text = ((item.title || '') + ' ' + (item.description || '')).toLowerCase();
+    for (const suffix of BLOCKED_DOMAINS_SUFFIX) {
+      try { if (new URL(url).hostname.endsWith(suffix)) return false; } catch {}
+    }
+    for (const kw of BLOCKED_KEYWORDS) {
+      if (text.includes(kw)) return false;
+    }
+    return true;
+  }
 
   try {
     const braveGet = (q) =>
@@ -26,33 +43,26 @@ export default async function handler(req, res) {
 
     const now = new Date().toISOString().slice(0, 10);
 
-    // Niche-dynamic queries
-    const queries = niche
-      ? [
-          `viral content formats trending ${niche} ${now}`,
-          `best hooks working ${niche} social media ${now}`,
-          `trending audio sounds ${niche} reels tiktok ${now}`,
-          `${niche} creators going viral what they post ${now}`,
-          `${niche} Instagram Reels TikTok algorithm tips ${now}`,
-          `${niche} short form video trends ${now}`,
-        ]
-      : [
-          `viral social media content formats trending ${now}`,
-          `best hooks for reels and tiktok going viral ${now}`,
-          `trending audio sounds reels tiktok ${now}`,
-          `social media algorithm changes Instagram TikTok ${now}`,
-          `short form video trends what is working ${now}`,
-          `viral content creator strategies ${now}`,
-        ];
+    const queries = [
+      `${niche} viral hook formats trending ${plat} ${now}`,
+      `${plat} algorithm update what content is getting pushed ${now}`,
+      `best performing video formats ${plat} creators ${now}`,
+      `${niche} content that converts to sales ${plat} 2026`,
+      `${plat} hook styles going viral right now ${now}`,
+      `how to beat ${plat} algorithm 2026 content creators`,
+      `${niche} behind the scenes content performing ${plat} ${now}`,
+      `trending video editing styles ${plat} 2026`
+    ];
 
     const results = await Promise.all(queries.map(q => braveGet(q)));
 
-    // Collect raw search results
+    // Collect raw search results, filtering out irrelevant content
     const seen = new Set();
     const rawItems = [];
     for (const result of results) {
       if (!result || !result.web || !result.web.results) continue;
       for (const item of result.web.results) {
+        if (!isRelevant(item)) continue;
         const key = item.title?.toLowerCase().trim();
         if (!key || seen.has(key)) continue;
         seen.add(key);
@@ -86,7 +96,7 @@ export default async function handler(req, res) {
         max_tokens: 1200,
         messages: [{
           role: 'user',
-          content: `You are a social media trend analyst. Analyze these search results about "${nicheLabel}" and extract the most actionable trend signals for a content creator in that niche.
+          content: `You are a social media content strategist. Analyze these search results about "${niche}" content on ${plat} and extract the most actionable trend signals for a content creator.
 
 Search results from today (${now}):
 ${searchDump}
@@ -105,8 +115,8 @@ Categories:
 - "creator_move": what successful creators in this niche are doing that's getting reach
 - "algorithm": platform signals, distribution changes, or ranking factors
 
-Be specific to "${nicheLabel}". Do not be generic. Every trend must be something a creator could act on TODAY.
-If the search results don't clearly support a trend, skip it — quality over quantity.`
+Be specific to "${niche}" on ${plat}. Do not be generic. Every trend must be about content creation, hooks, formats, editing styles, or platform algorithms — NOT market reports, news, or sales data.
+Every trend must be something a creator could act on TODAY. If the search results don't clearly support a trend, skip it — quality over quantity.`
         }]
       })
     });
