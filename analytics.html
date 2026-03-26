@@ -546,6 +546,18 @@ async function saveVideo() {
   setBtnLoading('saveBtn', 'saveSpinner', 'saveLbl', false, '+ Log This Video');
 }
 
+async function deleteVideo(id) {
+  if (!confirm('Delete this video entry?')) return;
+  try {
+    await fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', id })
+    });
+    loadVideos();
+  } catch(e) { showMsg('Delete failed: ' + e.message, 'error'); }
+}
+
 async function loadVideos() {
   try {
     const res = await fetch('/api/analytics', { headers: { 'x-account': currentAccount } });
@@ -601,6 +613,7 @@ async function loadVideos() {
           <div class="stat"><span class="stat-val">${v.saves||0}</span><span class="stat-lbl">Saves</span></div>
           <div class="stat"><span class="stat-val">${v.shares||0}</span><span class="stat-lbl">Shares</span></div>
         </div>
+        <button onclick="deleteVideo('${v.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:4px 8px;flex-shrink:0;transition:color 0.15s" onmouseover="this.style.color='#ff4d4d'" onmouseout="this.style.color='#4a5568'" title="Delete video">✕</button>
       </div>`).join('');
   } catch(e) {}
 }

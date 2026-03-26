@@ -227,6 +227,17 @@ If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200).
       return res.status(r.status).json(d);
     }
 
+    // Delete a video
+    if (action === 'delete') {
+      const { id } = req.body;
+      if (!id) return res.status(400).json({ error: 'No id provided' });
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/pvv_videos?id=eq.${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers
+      });
+      return res.status(r.status).json({ success: true });
+    }
+
     // Analyze patterns
     if (action === 'analyze') {
       const { account: analyzeAccount } = req.body;
