@@ -63,7 +63,7 @@ nav {
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
 .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
 .grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
-@media(max-width:600px){ .grid2,.grid3,.grid4 { grid-template-columns: 1fr; } }
+@media(max-width:600px){ .grid2,.grid3,.grid4 { grid-template-columns: 1fr 1fr; } }
 .field label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
 .field input, .field select, .field textarea {
   width: 100%; background: var(--surface2); border: 1px solid var(--border);
@@ -126,6 +126,7 @@ select option { background: var(--surface2); }
 .fetch-status.success { color: var(--green); }
 .fetch-status.error { color: var(--red); }
 @media(max-width:768px){ .url-row { flex-direction: column; } .fetch-btn { width: 100%; } }
+@media(max-width:600px){ [style*="grid-template-columns:repeat(5"] { grid-template-columns: 1fr 1fr !important; } [style*="grid-template-columns:repeat(3"] { grid-template-columns: 1fr !important; } }
 
 .img-upload-wrap { margin-bottom: 16px; }
 .img-drop-zone { border: 2px dashed var(--border2); border-radius: 8px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--surface2); position: relative; }
@@ -213,17 +214,65 @@ select option { background: var(--surface2); }
       <label>Hook Used (first 3 seconds)</label>
       <input id="v_hook" placeholder="Exact opening line or text on screen">
     </div>
-    <div class="grid3">
-      <div class="field"><label>Views</label><input type="number" id="v_views" placeholder="0"></div>
-      <div class="field"><label>Likes</label><input type="number" id="v_likes" placeholder="0"></div>
-      <div class="field"><label>Comments</label><input type="number" id="v_comments" placeholder="0"></div>
-      <div class="field"><label>Shares</label><input type="number" id="v_shares" placeholder="0"></div>
-      <div class="field"><label>Reach</label><input type="number" id="v_reach" placeholder="0"></div>
-      <div class="field"><label>Watch Time %</label><input type="number" id="v_watch" placeholder="0" min="0" max="100"></div>
+    <!-- VIEWS -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Views</div>
+      <div class="grid3">
+        <div class="field"><label>Total Views</label><input type="number" id="v_views" placeholder="0"></div>
+        <div class="field"><label>Follower Views</label><input type="number" id="v_views_followers" placeholder="0"></div>
+        <div class="field"><label>Non-Follower Views</label><input type="number" id="v_views_nonfollowers" placeholder="0"></div>
+      </div>
     </div>
-    <div class="toggle-row">
-      <label class="toggle-item"><input type="checkbox" id="v_dm"> Led to DM</label>
-      <label class="toggle-item"><input type="checkbox" id="v_booking"> Led to Booking</label>
+    <!-- TOP SOURCES -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Top Sources <span style="color:var(--muted);font-weight:400">(% of views)</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <div class="field"><label>Stories</label><input type="number" id="v_src_stories" placeholder="0" min="0" max="100" step="0.1"></div>
+        <div class="field"><label>Reels Tab</label><input type="number" id="v_src_reels" placeholder="0" min="0" max="100" step="0.1"></div>
+        <div class="field"><label>Profile</label><input type="number" id="v_src_profile" placeholder="0" min="0" max="100" step="0.1"></div>
+        <div class="field"><label>Feed</label><input type="number" id="v_src_feed" placeholder="0" min="0" max="100" step="0.1"></div>
+        <div class="field"><label>Explore</label><input type="number" id="v_src_explore" placeholder="0" min="0" max="100" step="0.1"></div>
+        <div class="field"><label>Search</label><input type="number" id="v_src_search" placeholder="0" min="0" max="100" step="0.1"></div>
+      </div>
+    </div>
+    <!-- RETENTION -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Retention</div>
+      <div class="grid2">
+        <div class="field"><label>Skip Rate %</label><input type="number" id="v_skip_rate" placeholder="0" min="0" max="100" step="0.1"></div>
+        <div class="field"><label>Typical Skip Rate %</label><input type="number" id="v_typical_skip" placeholder="0" min="0" max="100" step="0.1"></div>
+        <div class="field"><label>Total Watch Time (minutes)</label><input type="number" id="v_total_watch_min" placeholder="0" min="0" step="0.1"></div>
+        <div class="field"><label>Avg Watch Time (seconds)</label><input type="number" id="v_avg_watch_sec" placeholder="0" min="0" step="0.1"></div>
+      </div>
+    </div>
+    <!-- INTERACTIONS -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Interactions</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+        <div class="field"><label>Likes</label><input type="number" id="v_likes" placeholder="0"></div>
+        <div class="field"><label>Reposts</label><input type="number" id="v_reposts" placeholder="0"></div>
+        <div class="field"><label>Shares</label><input type="number" id="v_shares" placeholder="0"></div>
+        <div class="field"><label>Saves</label><input type="number" id="v_saves" placeholder="0"></div>
+        <div class="field"><label>Comments</label><input type="number" id="v_comments" placeholder="0"></div>
+      </div>
+    </div>
+    <!-- PROFILE ACTIVITY -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Profile Activity</div>
+      <div class="grid3" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="field"><label>Follows Gained</label><input type="number" id="v_follows" placeholder="0"></div>
+        <div class="field"><label>Led to DM</label><select id="v_dm"><option value="false">No</option><option value="true">Yes</option></select></div>
+        <div class="field"><label>Led to Booking</label><select id="v_booking"><option value="false">No</option><option value="true">Yes</option></select></div>
+      </div>
+    </div>
+    <!-- AUDIENCE -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Audience</div>
+      <div class="grid3">
+        <div class="field"><label>Top Country</label><input type="text" id="v_top_country" placeholder="e.g. United States"></div>
+        <div class="field"><label>Top Age Range</label><input type="text" id="v_top_age" placeholder="e.g. 25-34"></div>
+        <div class="field"><label>Gender Split (% Male)</label><input type="number" id="v_gender_male" placeholder="50" min="0" max="100" step="0.1"></div>
+      </div>
     </div>
     <div class="field" style="margin-bottom:18px">
       <label>Notes (optional)</label>
@@ -322,12 +371,29 @@ async function analyzeImage() {
     if (data.error && !data.raw_text) throw new Error(data.error);
 
     let filled = 0;
-    if (data.views) { document.getElementById('v_views').value = data.views; filled++; }
-    if (data.likes) { document.getElementById('v_likes').value = data.likes; filled++; }
-    if (data.comments) { document.getElementById('v_comments').value = data.comments; filled++; }
-    if (data.shares) { document.getElementById('v_shares').value = data.shares; filled++; }
-    if (data.reach) { document.getElementById('v_reach').value = data.reach; filled++; }
-    if (data.watch_time_pct) { document.getElementById('v_watch').value = data.watch_time_pct; filled++; }
+    const autoFill = (key, elId) => { if (data[key] != null && data[key] !== '') { document.getElementById(elId).value = data[key]; filled++; } };
+    autoFill('views', 'v_views');
+    autoFill('views_followers', 'v_views_followers');
+    autoFill('views_nonfollowers', 'v_views_nonfollowers');
+    autoFill('src_stories', 'v_src_stories');
+    autoFill('src_reels', 'v_src_reels');
+    autoFill('src_profile', 'v_src_profile');
+    autoFill('src_feed', 'v_src_feed');
+    autoFill('src_explore', 'v_src_explore');
+    autoFill('src_search', 'v_src_search');
+    autoFill('skip_rate', 'v_skip_rate');
+    autoFill('typical_skip_rate', 'v_typical_skip');
+    autoFill('total_watch_min', 'v_total_watch_min');
+    autoFill('avg_watch_sec', 'v_avg_watch_sec');
+    autoFill('likes', 'v_likes');
+    autoFill('reposts', 'v_reposts');
+    autoFill('shares', 'v_shares');
+    autoFill('saves', 'v_saves');
+    autoFill('comments', 'v_comments');
+    autoFill('follows_gained', 'v_follows');
+    autoFill('top_country', 'v_top_country');
+    autoFill('top_age_range', 'v_top_age');
+    autoFill('gender_male_pct', 'v_gender_male');
     if (data.platform && data.platform !== 'unknown') {
       const sel = document.getElementById('v_platform');
       for (let i = 0; i < sel.options.length; i++) {
@@ -439,13 +505,29 @@ async function saveVideo() {
     account: currentAccount,
     reel_url: document.getElementById('v_url').value.trim(),
     views: document.getElementById('v_views').value,
+    views_followers: document.getElementById('v_views_followers').value,
+    views_nonfollowers: document.getElementById('v_views_nonfollowers').value,
+    src_stories: document.getElementById('v_src_stories').value,
+    src_reels: document.getElementById('v_src_reels').value,
+    src_profile: document.getElementById('v_src_profile').value,
+    src_feed: document.getElementById('v_src_feed').value,
+    src_explore: document.getElementById('v_src_explore').value,
+    src_search: document.getElementById('v_src_search').value,
+    skip_rate: document.getElementById('v_skip_rate').value,
+    typical_skip_rate: document.getElementById('v_typical_skip').value,
+    total_watch_min: document.getElementById('v_total_watch_min').value,
+    avg_watch_sec: document.getElementById('v_avg_watch_sec').value,
     likes: document.getElementById('v_likes').value,
-    comments: document.getElementById('v_comments').value,
+    reposts: document.getElementById('v_reposts').value,
     shares: document.getElementById('v_shares').value,
-    reach: document.getElementById('v_reach').value,
-    watch_time_pct: document.getElementById('v_watch').value,
-    led_to_dm: document.getElementById('v_dm').checked,
-    led_to_booking: document.getElementById('v_booking').checked,
+    saves: document.getElementById('v_saves').value,
+    comments: document.getElementById('v_comments').value,
+    follows_gained: document.getElementById('v_follows').value,
+    led_to_dm: document.getElementById('v_dm').value === 'true',
+    led_to_booking: document.getElementById('v_booking').value === 'true',
+    top_country: document.getElementById('v_top_country').value,
+    top_age_range: document.getElementById('v_top_age').value,
+    gender_male_pct: document.getElementById('v_gender_male').value,
     notes: document.getElementById('v_notes').value
   };
 
@@ -475,15 +557,22 @@ async function loadVideos() {
 
     // Overview metrics
     const totalViews = videos.reduce((s,v) => s + (v.views||0), 0);
-    const avgWatch = videos.length ? (videos.reduce((s,v) => s + (v.watch_time_pct||0), 0) / videos.length).toFixed(1) : 0;
+    const avgWatchSec = videos.length ? (videos.reduce((s,v) => s + (v.avg_watch_sec||0), 0) / videos.length).toFixed(1) : 0;
+    const totalFollows = videos.reduce((s,v) => s + (v.follows_gained||0), 0);
+    const totalSaves = videos.reduce((s,v) => s + (v.saves||0), 0);
     const bookings = videos.filter(v => v.led_to_booking).length;
-    const topVideo = [...videos].sort((a,b) => (b.views||0)-(a.views||0))[0];
+    const avgSkip = videos.length ? (videos.reduce((s,v) => s + (v.skip_rate||0), 0) / videos.length).toFixed(1) : 0;
+    const nonFollowerPct = totalViews > 0 ? ((videos.reduce((s,v) => s + (v.views_nonfollowers||0), 0) / totalViews) * 100).toFixed(0) : 0;
 
     document.getElementById('overviewMetrics').innerHTML = [
       { v: videos.length, l: 'Videos Logged' },
       { v: totalViews.toLocaleString(), l: 'Total Views' },
-      { v: avgWatch + '%', l: 'Avg Watch Time' },
-      { v: bookings, l: 'Bookings Generated' }
+      { v: nonFollowerPct + '%', l: 'Non-Follower Reach' },
+      { v: avgWatchSec + 's', l: 'Avg Watch Time' },
+      { v: avgSkip + '%', l: 'Avg Skip Rate' },
+      { v: totalSaves, l: 'Total Saves' },
+      { v: totalFollows, l: 'Follows Gained' },
+      { v: bookings, l: 'Bookings' }
     ].map(m => `<div class="metric"><span class="metric-val">${m.v}</span><span class="metric-label">${m.l}</span></div>`).join('');
 
     // Video log
@@ -503,7 +592,8 @@ async function loadVideos() {
         </div>
         <div class="video-stats">
           <div class="stat"><span class="stat-val">${(v.views||0).toLocaleString()}</span><span class="stat-lbl">Views</span></div>
-          <div class="stat"><span class="stat-val">${v.watch_time_pct||0}%</span><span class="stat-lbl">Watch</span></div>
+          <div class="stat"><span class="stat-val">${v.avg_watch_sec||0}s</span><span class="stat-lbl">Avg Watch</span></div>
+          <div class="stat"><span class="stat-val">${v.saves||0}</span><span class="stat-lbl">Saves</span></div>
           <div class="stat"><span class="stat-val">${v.shares||0}</span><span class="stat-lbl">Shares</span></div>
         </div>
       </div>`).join('');
@@ -583,11 +673,11 @@ function clearForm() {
   if (analyzeBtn) analyzeBtn.classList.remove('active');
   document.getElementById('imgInput').value = '';
   setImgStatus('', '');
-  ['v_url','v_title','v_format','v_hook','v_views','v_likes','v_comments','v_shares','v_reach','v_watch','v_notes'].forEach(id => {
+  ['v_url','v_title','v_format','v_hook','v_views','v_views_followers','v_views_nonfollowers','v_src_stories','v_src_reels','v_src_profile','v_src_feed','v_src_explore','v_src_search','v_skip_rate','v_typical_skip','v_total_watch_min','v_avg_watch_sec','v_likes','v_reposts','v_shares','v_saves','v_comments','v_follows','v_top_country','v_top_age','v_gender_male','v_notes'].forEach(id => {
     document.getElementById(id).value = '';
   });
-  document.getElementById('v_dm').checked = false;
-  document.getElementById('v_booking').checked = false;
+  document.getElementById('v_dm').value = 'false';
+  document.getElementById('v_booking').value = 'false';
   document.getElementById('v_date').value = new Date().toISOString().slice(0,10);
 }
 

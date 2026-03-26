@@ -139,19 +139,33 @@ export default async function handler(req, res) {
                 text: `You are analyzing a social media analytics screenshot (Instagram, TikTok, or similar).
 Extract all visible metrics and return ONLY valid JSON with no markdown:
 {
-  "views": <number or null>,
+  "views": <total views number or null>,
+  "views_followers": <follower views number or null>,
+  "views_nonfollowers": <non-follower views number or null>,
+  "src_stories": <stories source % or null>,
+  "src_reels": <reels tab source % or null>,
+  "src_profile": <profile source % or null>,
+  "src_feed": <feed source % or null>,
+  "src_explore": <explore source % or null>,
+  "src_search": <search source % or null>,
+  "skip_rate": <skip rate % or null>,
+  "typical_skip_rate": <typical/average skip rate % or null>,
+  "total_watch_min": <total watch time in minutes or null>,
+  "avg_watch_sec": <average watch time in seconds or null>,
   "likes": <number or null>,
-  "comments": <number or null>,
+  "reposts": <number or null>,
   "shares": <number or null>,
-  "reach": <number or null>,
-  "watch_time_pct": <number 0-100 or null>,
   "saves": <number or null>,
-  "impressions": <number or null>,
+  "comments": <number or null>,
+  "follows_gained": <follows from this content or null>,
+  "top_country": "<country name or null>",
+  "top_age_range": "<age range like 25-34 or null>",
+  "gender_male_pct": <male % or null>,
   "platform": "<Instagram|TikTok|YouTube|LinkedIn|unknown>",
   "notes": "<any other useful info visible like date range, content type, or notable metrics>",
   "raw_text": "<all numbers and labels you can read from the image>"
 }
-If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200).`
+If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200). For time values, convert to the requested unit (minutes or seconds).`
               }
             ]
           }]
@@ -170,21 +184,37 @@ If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200).
     }
 
     if (action === 'save') {
-      const { title, platform, format, hook, posted_date, views, likes, comments, shares, watch_time_pct, reach, led_to_dm, led_to_booking, notes, reel_url, account } = req.body;
+      const b = req.body;
 
       const payload = {
-        title, platform, format, hook, posted_date,
-        views: parseInt(views) || 0,
-        likes: parseInt(likes) || 0,
-        comments: parseInt(comments) || 0,
-        shares: parseInt(shares) || 0,
-        watch_time_pct: parseFloat(watch_time_pct) || 0,
-        reach: parseInt(reach) || 0,
-        led_to_dm: led_to_dm === true || led_to_dm === 'true',
-        led_to_booking: led_to_booking === true || led_to_booking === 'true',
-        notes: notes || '',
-        reel_url: reel_url || '',
-        account: account || 'PVV',
+        title: b.title, platform: b.platform, format: b.format, hook: b.hook, posted_date: b.posted_date,
+        views: parseInt(b.views) || 0,
+        views_followers: parseInt(b.views_followers) || 0,
+        views_nonfollowers: parseInt(b.views_nonfollowers) || 0,
+        src_stories: parseFloat(b.src_stories) || 0,
+        src_reels: parseFloat(b.src_reels) || 0,
+        src_profile: parseFloat(b.src_profile) || 0,
+        src_feed: parseFloat(b.src_feed) || 0,
+        src_explore: parseFloat(b.src_explore) || 0,
+        src_search: parseFloat(b.src_search) || 0,
+        skip_rate: parseFloat(b.skip_rate) || 0,
+        typical_skip_rate: parseFloat(b.typical_skip_rate) || 0,
+        total_watch_min: parseFloat(b.total_watch_min) || 0,
+        avg_watch_sec: parseFloat(b.avg_watch_sec) || 0,
+        likes: parseInt(b.likes) || 0,
+        reposts: parseInt(b.reposts) || 0,
+        shares: parseInt(b.shares) || 0,
+        saves: parseInt(b.saves) || 0,
+        comments: parseInt(b.comments) || 0,
+        follows_gained: parseInt(b.follows_gained) || 0,
+        led_to_dm: b.led_to_dm === true || b.led_to_dm === 'true',
+        led_to_booking: b.led_to_booking === true || b.led_to_booking === 'true',
+        top_country: b.top_country || '',
+        top_age_range: b.top_age_range || '',
+        gender_male_pct: parseFloat(b.gender_male_pct) || 0,
+        notes: b.notes || '',
+        reel_url: b.reel_url || '',
+        account: b.account || 'PVV',
         created_at: new Date().toISOString()
       };
 
@@ -211,7 +241,7 @@ If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200).
 
       // Build analysis prompt
       const summary = videos.map(v =>
-        `Title: ${v.title} | Platform: ${v.platform} | Format: ${v.format} | Hook: ${v.hook} | Views: ${v.views} | Likes: ${v.likes} | Shares: ${v.shares} | Watch Time: ${v.watch_time_pct}% | Led to DM: ${v.led_to_dm} | Led to Booking: ${v.led_to_booking}`
+        `Title: ${v.title} | Platform: ${v.platform} | Format: ${v.format} | Hook: ${v.hook} | Views: ${v.views} (Followers: ${v.views_followers||0}, Non-followers: ${v.views_nonfollowers||0}) | Sources: Stories ${v.src_stories||0}%, Reels ${v.src_reels||0}%, Profile ${v.src_profile||0}%, Feed ${v.src_feed||0}%, Explore ${v.src_explore||0}%, Search ${v.src_search||0}% | Skip Rate: ${v.skip_rate||0}% (Typical: ${v.typical_skip_rate||0}%) | Watch: ${v.total_watch_min||0}min total, ${v.avg_watch_sec||0}s avg | Likes: ${v.likes} | Reposts: ${v.reposts||0} | Shares: ${v.shares} | Saves: ${v.saves||0} | Comments: ${v.comments} | Follows: ${v.follows_gained||0} | DM: ${v.led_to_dm} | Booking: ${v.led_to_booking} | Audience: ${v.top_country||'—'}, ${v.top_age_range||'—'}, ${v.gender_male_pct||0}% male`
       ).join('\n');
 
       const acctName = req.body.account || 'PVV';
