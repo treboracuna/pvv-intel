@@ -535,8 +535,10 @@ async function saveVideo() {
   try {
     const res = await fetch('/api/analytics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     const data = await res.json();
-    if (data.error || (Array.isArray(data) && data[0]?.code)) {
-      throw new Error(data.message || data.error || 'Save failed — make sure the pvv_videos table exists in Supabase');
+    console.log('[saveVideo] Response status from API:', res.status);
+    console.log('[saveVideo] Response body:', JSON.stringify(data));
+    if (res.status >= 400 || data.error || data.code || (Array.isArray(data) && data[0]?.code)) {
+      throw new Error(data.message || data.error || data.hint || JSON.stringify(data));
     }
     showMsg('Video logged successfully.', 'success');
     clearForm();

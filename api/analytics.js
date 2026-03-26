@@ -80,7 +80,11 @@ export default async function handler(req, res) {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
 
+  console.log('[analytics] SUPABASE_URL:', SUPABASE_URL ? `${SUPABASE_URL.slice(0, 30)}...` : 'MISSING');
+  console.log('[analytics] SUPABASE_KEY:', SUPABASE_KEY ? `${SUPABASE_KEY.slice(0, 8)}...${SUPABASE_KEY.slice(-4)}` : 'MISSING');
+
   if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.error('[analytics] FATAL: Supabase env vars missing — SUPABASE_URL:', !!SUPABASE_URL, 'SUPABASE_ANON_KEY:', !!SUPABASE_KEY);
     return res.status(500).json({ error: 'Supabase not configured' });
   }
 
@@ -218,12 +222,32 @@ If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200).
         created_at: new Date().toISOString()
       };
 
+      console.log('[analytics:save] Payload to insert:', JSON.stringify(payload, null, 2));
+      console.log('[analytics:save] Supabase POST URL:', `${SUPABASE_URL}/rest/v1/pvv_videos`);
+
       const r = await fetch(`${SUPABASE_URL}/rest/v1/pvv_videos`, {
         method: 'POST',
         headers: { ...headers, 'Prefer': 'return=representation' },
         body: JSON.stringify(payload)
       });
-      const d = await r.json();
+
+      const responseText = await r.text();
+      console.log('[analytics:save] Supabase response status:', r.status);
+      console.log('[analytics:save] Supabase response headers:', JSON.stringify(Object.fromEntries(r.headers.entries())));
+      console.log('[analytics:save] Supabase response body:', responseText);
+
+      let d;
+      try {
+        d = JSON.parse(responseText);
+      } catch (e) {
+        console.error('[analytics:save] Failed to parse response as JSON:', e.message);
+        return res.status(500).json({ error: 'Invalid response from Supabase', raw: responseText });
+      }
+
+      if (r.status >= 400) {
+        console.error('[analytics:save] Supabase returned error status:', r.status, d);
+      }
+
       return res.status(r.status).json(d);
     }
 
