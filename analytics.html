@@ -219,8 +219,8 @@ select option { background: var(--surface2); }
       <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Views</div>
       <div class="grid3">
         <div class="field"><label>Total Views</label><input type="number" id="v_views" placeholder="0"></div>
-        <div class="field"><label>Follower Views</label><input type="number" id="v_views_followers" placeholder="0"></div>
-        <div class="field"><label>Non-Follower Views</label><input type="number" id="v_views_nonfollowers" placeholder="0"></div>
+        <div class="field"><label>Followers %</label><input type="number" id="v_views_followers" placeholder="0" min="0" max="100" step="0.1"></div>
+        <div class="field"><label>Non-Followers %</label><input type="number" id="v_views_nonfollowers" placeholder="0" min="0" max="100" step="0.1"></div>
       </div>
     </div>
     <!-- TOP SOURCES -->
@@ -562,7 +562,7 @@ async function loadVideos() {
     const totalSaves = videos.reduce((s,v) => s + (v.saves||0), 0);
     const bookings = videos.filter(v => v.led_to_booking).length;
     const avgSkip = videos.length ? (videos.reduce((s,v) => s + (v.skip_rate||0), 0) / videos.length).toFixed(1) : 0;
-    const nonFollowerPct = totalViews > 0 ? ((videos.reduce((s,v) => s + (v.views_nonfollowers||0), 0) / totalViews) * 100).toFixed(0) : 0;
+    const nonFollowerPct = videos.length ? (videos.reduce((s,v) => s + (v.views_nonfollowers_pct||0), 0) / videos.length).toFixed(0) : 0;
 
     document.getElementById('overviewMetrics').innerHTML = [
       { v: videos.length, l: 'Videos Logged' },

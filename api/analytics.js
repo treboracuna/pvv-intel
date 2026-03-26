@@ -140,8 +140,8 @@ export default async function handler(req, res) {
 Extract all visible metrics and return ONLY valid JSON with no markdown:
 {
   "views": <total views number or null>,
-  "views_followers": <follower views number or null>,
-  "views_nonfollowers": <non-follower views number or null>,
+  "views_followers": <follower views % or null>,
+  "views_nonfollowers": <non-follower views % or null>,
   "src_stories": <stories source % or null>,
   "src_reels": <reels tab source % or null>,
   "src_profile": <profile source % or null>,
@@ -189,8 +189,8 @@ If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200).
       const payload = {
         title: b.title, platform: b.platform, format: b.format, hook: b.hook, posted_date: b.posted_date,
         views: parseInt(b.views) || 0,
-        views_followers: parseInt(b.views_followers) || 0,
-        views_nonfollowers: parseInt(b.views_nonfollowers) || 0,
+        views_followers_pct: parseFloat(b.views_followers) || 0,
+        views_nonfollowers_pct: parseFloat(b.views_nonfollowers) || 0,
         src_stories: parseFloat(b.src_stories) || 0,
         src_reels: parseFloat(b.src_reels) || 0,
         src_profile: parseFloat(b.src_profile) || 0,
@@ -241,7 +241,7 @@ If a metric is not visible, use null. Convert K/M to full numbers (1.2K = 1200).
 
       // Build analysis prompt
       const summary = videos.map(v =>
-        `Title: ${v.title} | Platform: ${v.platform} | Format: ${v.format} | Hook: ${v.hook} | Views: ${v.views} (Followers: ${v.views_followers||0}, Non-followers: ${v.views_nonfollowers||0}) | Sources: Stories ${v.src_stories||0}%, Reels ${v.src_reels||0}%, Profile ${v.src_profile||0}%, Feed ${v.src_feed||0}%, Explore ${v.src_explore||0}%, Search ${v.src_search||0}% | Skip Rate: ${v.skip_rate||0}% (Typical: ${v.typical_skip_rate||0}%) | Watch: ${v.total_watch_min||0}min total, ${v.avg_watch_sec||0}s avg | Likes: ${v.likes} | Reposts: ${v.reposts||0} | Shares: ${v.shares} | Saves: ${v.saves||0} | Comments: ${v.comments} | Follows: ${v.follows_gained||0} | DM: ${v.led_to_dm} | Booking: ${v.led_to_booking} | Audience: ${v.top_country||'—'}, ${v.top_age_range||'—'}, ${v.gender_male_pct||0}% male`
+        `Title: ${v.title} | Platform: ${v.platform} | Format: ${v.format} | Hook: ${v.hook} | Views: ${v.views} (Followers: ${v.views_followers_pct||0}%, Non-followers: ${v.views_nonfollowers_pct||0}%) | Sources: Stories ${v.src_stories||0}%, Reels ${v.src_reels||0}%, Profile ${v.src_profile||0}%, Feed ${v.src_feed||0}%, Explore ${v.src_explore||0}%, Search ${v.src_search||0}% | Skip Rate: ${v.skip_rate||0}% (Typical: ${v.typical_skip_rate||0}%) | Watch: ${v.total_watch_min||0}min total, ${v.avg_watch_sec||0}s avg | Likes: ${v.likes} | Reposts: ${v.reposts||0} | Shares: ${v.shares} | Saves: ${v.saves||0} | Comments: ${v.comments} | Follows: ${v.follows_gained||0} | DM: ${v.led_to_dm} | Booking: ${v.led_to_booking} | Audience: ${v.top_country||'—'}, ${v.top_age_range||'—'}, ${v.gender_male_pct||0}% male`
       ).join('\n');
 
       const acctName = req.body.account || 'PVV';
