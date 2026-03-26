@@ -1113,6 +1113,51 @@ function setLoading(on) {
   }
 }
 
+// ---- ANALYTICS INJECTION ----
+async function getAnalyticsContext() {
+  try {
+    const res = await fetch('/api/analytics', { headers: { 'x-account': 'PVV' } });
+    const videos = await res.json();
+    if (!Array.isArray(videos) || videos.length < 2) return '';
+
+    const sorted = [...videos].sort((a,b) => (b.views||0) - (a.views||0));
+    const top5 = sorted.slice(0, 5);
+    const dmVideos = videos.filter(v => v.led_to_dm);
+    const bookingVideos = videos.filter(v => v.led_to_booking);
+    const totalViews = videos.reduce((s,v) => s + (v.views||0), 0);
+    const avgWatchSec = videos.length ? (videos.reduce((s,v) => s + (v.avg_watch_sec||0), 0) / videos.length).toFixed(1) : 0;
+    const avgSkip = videos.length ? (videos.reduce((s,v) => s + (v.skip_rate||0), 0) / videos.length).toFixed(1) : 0;
+
+    // Top formats by views
+    const formatViews = {};
+    videos.forEach(v => { if (v.format) { formatViews[v.format] = (formatViews[v.format]||0) + (v.views||0); } });
+    const topFormats = Object.entries(formatViews).sort((a,b) => b[1]-a[1]).slice(0,3).map(f => f[0]);
+
+    // Best hooks (from top performers)
+    const bestHooks = top5.filter(v => v.hook).map(v => `"${v.hook}" (${(v.views||0).toLocaleString()} views)`);
+
+    // Best sources
+    const avgExplore = videos.length ? (videos.reduce((s,v) => s + (v.src_explore||0), 0) / videos.length).toFixed(1) : 0;
+    const avgReels = videos.length ? (videos.reduce((s,v) => s + (v.src_reels||0), 0) / videos.length).toFixed(1) : 0;
+
+    let ctx = `\n\nPVV ANALYTICS — YOUR PROVEN PERFORMANCE DATA (${videos.length} videos logged):`;
+    ctx += `\n- Total views across all content: ${totalViews.toLocaleString()}`;
+    ctx += `\n- Avg watch time: ${avgWatchSec}s | Avg skip rate: ${avgSkip}%`;
+    ctx += `\n- Top performing formats: ${topFormats.join(', ') || 'N/A'}`;
+    ctx += `\n- Avg Explore reach: ${avgExplore}% | Avg Reels Tab reach: ${avgReels}%`;
+    if (bestHooks.length) ctx += `\n- Best hooks: ${bestHooks.join(' | ')}`;
+    if (dmVideos.length) ctx += `\n- Hooks that led to DMs: ${dmVideos.map(v => `"${v.hook}"`).join(', ')}`;
+    if (bookingVideos.length) ctx += `\n- Hooks that led to bookings: ${bookingVideos.map(v => `"${v.hook}" (${v.format})`).join(', ')}`;
+    ctx += `\n\nUSE THIS DATA TO INFORM EVERY IDEA:`;
+    ctx += `\n- Prioritize formats and hook styles that already perform for PVV`;
+    ctx += `\n- Double down on what led to DMs and bookings`;
+    ctx += `\n- Avoid formats or approaches not represented in the top performers`;
+    ctx += `\n- Match the avg watch time — hooks must retain past ${avgWatchSec}s`;
+    return ctx;
+  } catch(e) { return ''; }
+}
+// ---- END ANALYTICS INJECTION ----
+
 // Main runner
 async function runSystem() {
   const niche = document.getElementById('niche').value.trim();
@@ -1125,7 +1170,8 @@ async function runSystem() {
 
   const goal = document.getElementById('goal').value;
   const count = document.getElementById('count').value;
-  const ctx = document.getElementById("ctx").value.trim() + getProfileContext();
+  const analyticsCtx = await getAnalyticsContext();
+  const ctx = document.getElementById("ctx").value.trim() + getProfileContext() + analyticsCtx;
   const location = document.getElementById('location').value.trim();
 
   const prompt = `You are a viral content strategy system for Prestige Valley Visuals (PVV), a premium real estate video production company.
