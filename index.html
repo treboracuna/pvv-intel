@@ -59,15 +59,16 @@ body {
   overflow-x: hidden;
 }
 
-/* GRID BG */
+/* AMBIENT BG */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(201,168,76,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201,168,76,0.02) 1px, transparent 1px);
-  background-size: 44px 44px;
+  background:
+    radial-gradient(600px circle at 85% 10%, rgba(201,168,76,0.04), transparent 70%),
+    radial-gradient(400px circle at 10% 90%, rgba(59,139,235,0.03), transparent 70%),
+    radial-gradient(300px circle at 90% 55%, rgba(201,168,76,0.03), transparent 70%),
+    radial-gradient(500px circle at 15% 15%, rgba(59,139,235,0.02), transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -2040,9 +2041,9 @@ function renderProfileView(p) {
     { label: "Equipment", value: (p.equipment || "").split(",").length + " items" }
   ];
   document.getElementById("profileView").innerHTML = items.map(item => `
-    <div style="background:var(--surface2);border:1px solid ${item.warn ? "rgba(255,77,77,0.3)" : "var(--border)"};border-radius:7px;padding:12px 14px">
+    <div style="background:var(--surface2);border:1px solid ${item.warn ? "rgba(59,139,235,0.3)" : "var(--border)"};border-radius:7px;padding:12px 14px">
       <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${item.label}</div>
-      <div style="font-family:IBM Plex Mono,monospace;font-size:24px;color:${item.warn ? "var(--red)" : item.accent ? "var(--accent)" : "var(--text)"};font-weight:500">${item.value}</div>
+      <div style="font-family:IBM Plex Mono,monospace;font-size:24px;color:${item.warn ? "#3b8beb" : item.accent ? "var(--accent)" : "var(--text)"};font-weight:500">${item.value}</div>
     </div>`).join("");
 }
 
@@ -2062,9 +2063,9 @@ function renderProfileAlerts(p) {
     }
   }
   document.getElementById("profileAlerts").innerHTML = alerts.map(a => `
-    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:6px;margin-top:8px;background:${a.type === "red" ? "var(--red-dim)" : a.type === "orange" ? "rgba(255,140,58,0.08)" : "var(--accent-dim)"};border:1px solid ${a.type === "red" ? "rgba(255,77,77,0.2)" : a.type === "orange" ? "rgba(255,140,58,0.2)" : "rgba(201,168,76,0.2)"}">
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:6px;margin-top:8px;background:rgba(59,139,235,0.08);border:1px solid rgba(59,139,235,0.2)">
       <span style="font-size:14px">${a.icon}</span>
-      <span style="font-size:12px;color:${a.type === "red" ? "var(--red)" : a.type === "orange" ? "var(--orange)" : "var(--accent)"};font-family:IBM Plex Mono,monospace;line-height:1.5">${a.msg}</span>
+      <span style="font-size:12px;color:#3b8beb;font-family:IBM Plex Mono,monospace;line-height:1.5">${a.msg}</span>
     </div>`).join("");
 }
 
