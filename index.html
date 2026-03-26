@@ -365,6 +365,20 @@ select option { background: var(--surface2); }
   font-size: 13px;
 }
 
+/* TEMPLATE DROPDOWN */
+#tmplDrop.open { display: block !important; }
+.tmpl-opt {
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.12s;
+  border-bottom: 1px solid var(--border);
+}
+.tmpl-opt:last-child { border-bottom: none; }
+.tmpl-opt:hover { background: var(--accent-dim); color: var(--accent); }
+
 /* RUN BUTTON */
 .run-btn {
   width: 100%;
@@ -1038,7 +1052,16 @@ footer {
       </div>
     </div>
     <div class="field" style="margin-bottom:18px">
-      <label>Context</label>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px;position:relative">
+        <label style="margin-bottom:0">Context</label>
+        <button id="tmplBtn" onclick="document.getElementById('tmplDrop').classList.toggle('open')" style="padding:3px 10px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10px;border-radius:4px;cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Templates ▾</button>
+        <div id="tmplDrop" style="display:none;position:absolute;top:100%;left:60px;margin-top:4px;background:var(--surface);border:1px solid var(--border2);border-radius:6px;min-width:220px;z-index:50;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.4)">
+          <div class="tmpl-opt" onclick="applyTemplate('universal')">Universal Client</div>
+          <div class="tmpl-opt" onclick="applyTemplate('realtor')">Real Estate Agent</div>
+          <div class="tmpl-opt" onclick="applyTemplate('commercial')">Commercial Development</div>
+          <div class="tmpl-opt" onclick="applyTemplate('business')">Business Branding</div>
+        </div>
+      </div>
       <textarea id="ctx">We specialize in luxury real estate video production in the Rio Grande Valley. Services: listing videos, agent brand content, drone footage, property walkthroughs. Goal: attract high-ticket real estate clients and position as the premium option in the market.</textarea>
     </div>
     <button class="run-btn" id="runBtn" onclick="runSystem()">
@@ -1671,6 +1694,69 @@ function escHtml(str) {
   return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+
+// ---- CONTEXT TEMPLATES ----
+const CTX_TEMPLATES = {
+  universal: `This content is for the {Client/Brand Name} Instagram page. PVV is producing it. The goal is to [attract customers / generate leads / build brand awareness] for [project name] in [location].
+
+All ideas should be written as if posting from the {Client/Brand Name} brand — [one line describing what the brand does] — not a video company.
+
+Shooting for: [target person]
+Their pain point: [what they urgently need]
+Current project: [describe exactly what is being filmed and why]
+Tone: [luxury + raw / energetic + authentic / cinematic + behind the scenes]
+What we want viewers to do: [DM us / call / visit / book a consultation]
+What to avoid: No fake stats, no generic hooks, no corporate language. Speak directly to [target person] who is ready to take action.`,
+
+  realtor: `This content is for [Agent Name]'s Instagram page. PVV is producing it. The goal is to position them as the top agent in [city/area] and attract listing clients.
+
+All ideas should be written as if posting from the agent's personal brand — [describe their positioning: luxury specialist / relocation expert / first-time buyer advocate] — not a video company.
+
+Shooting for: [homeowners looking to sell / buyers / investors]
+Their pain point: [homes sitting on market / not getting offers / need to sell fast]
+Current project: [listing video / agent brand content / market update / day in the life]
+Tone: [authoritative + approachable / luxury + personal]
+What we want viewers to do: [DM the agent / call for a free consultation / ask about their listing]
+What to avoid: No fake stats, no generic hooks. Speak directly to motivated sellers or buyers in [market].`,
+
+  commercial: `This content is for the {Developer/Brand Name} Instagram page. PVV is producing it. The goal is to [attract tenants / sell units / build brand awareness] for [project name] in [location].
+
+All ideas should be written as if posting from the {Developer/Brand Name} brand — luxury commercial and residential real estate developer in the Rio Grande Valley — not a video company.
+
+Shooting for: [business owners / investors / buyers / tenants]
+Their pain point: [lease ending / need professional space / looking for investment opportunity]
+Current project: [describe what is being built or sold and current construction stage]
+Tone: [luxury + raw / aspirational + accessible / cinematic + behind the scenes]
+What we want viewers to do: [DM for availability / schedule a tour / ask about investment]
+What to avoid: No fake stats, no generic hooks, no corporate language. Speak directly to [target person] ready to move.`,
+
+  business: `This content is for {Business Name} Instagram page. PVV is producing it. The goal is to [attract customers / build brand loyalty / drive foot traffic / generate leads].
+
+All ideas should be written as if posting from {Business Name} — [describe what the business does and their positioning] — not a video company.
+
+Shooting for: [target customer type]
+Their pain point: [what problem the business solves for them]
+Current project: [brand video / promo content / behind the scenes / product showcase]
+Tone: [describe the brand energy]
+What we want viewers to do: [visit / order / book / DM / call]
+What to avoid: No fake stats, no generic hooks. Speak directly to [target customer] who needs what this business offers.`
+};
+
+function applyTemplate(key) {
+  const tpl = CTX_TEMPLATES[key];
+  if (tpl) document.getElementById('ctx').value = tpl;
+  document.getElementById('tmplDrop').classList.remove('open');
+}
+
+// Close template dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  const drop = document.getElementById('tmplDrop');
+  const btn = document.getElementById('tmplBtn');
+  if (drop && !drop.contains(e.target) && e.target !== btn) {
+    drop.classList.remove('open');
+  }
+});
+// ---- END CONTEXT TEMPLATES ----
 
 // ---- CONTENT CALENDAR ----
 const CAL_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
