@@ -807,6 +807,92 @@ footer {
 @media(max-width:768px) {
   .script-hook, .script-cta, .script-body-item { font-size: 12px; padding: 10px 12px; }
 }
+
+/* CAPTION GENERATOR */
+.caption-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 14px;
+  margin-left: 10px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.caption-btn:hover { border-color: var(--accent); color: var(--accent); }
+.caption-btn.loading { opacity: 0.5; pointer-events: none; }
+.caption-btn .caption-spin {
+  width: 12px; height: 12px;
+  border: 2px solid var(--muted);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: none;
+}
+.caption-btn.loading .caption-spin { display: inline-block; }
+.caption-output {
+  margin-top: 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  position: relative;
+  animation: fadein 0.3s ease forwards;
+}
+.caption-output-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.caption-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.caption-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #000;
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.caption-copy-btn:hover { background: #e8ff60; }
+.caption-copy-btn.copied { background: var(--green); }
+@media(max-width:768px) {
+  .caption-btn { margin-left: 0; margin-top: 10px; font-size: 10px; padding: 7px 12px; }
+  .caption-output { padding: 14px; }
+  .caption-text { font-size: 12px; }
+  .caption-copy-btn { font-size: 10px; padding: 7px 12px; }
+}
 </style>
 </head>
 <body>
@@ -1255,7 +1341,11 @@ function renderResults(data) {
             </div>`).join('')}
           </div>
         </div>` : ''}
-        <button class="save-btn" onclick="saveIdea(${i})">+ Save Idea</button>
+        <div style="display:flex;flex-wrap:wrap;align-items:center">
+          <button class="save-btn" onclick="saveIdea(${i})">+ Save Idea</button>
+          <button class="caption-btn" id="captionBtn_${i}" onclick="generateCaption(${i})"><span class="caption-spin"></span> Generate Caption</button>
+        </div>
+        <div id="captionOut_${i}"></div>
       </div>
     </div>`).join('');
 
@@ -1751,16 +1841,16 @@ function renderProfileView(p) {
 function renderProfileAlerts(p) {
   const alerts = [];
   if (parseInt(p.testimonials) === 0) {
-    alerts.push({ type: "red", icon: "??", msg: "Zero testimonials ó request one from " + (p.testimonial_eligible || "your current clients") + " this week." });
+    alerts.push({ type: "red", icon: "??", msg: "Zero testimonials ÔøΩ request one from " + (p.testimonial_eligible || "your current clients") + " this week." });
   }
   if (parseInt(p.client_count) < 3) {
-    alerts.push({ type: "orange", icon: "??", msg: "Under 3 clients ó content should focus on client attraction and authority positioning." });
+    alerts.push({ type: "orange", icon: "??", msg: "Under 3 clients ÔøΩ content should focus on client attraction and authority positioning." });
   }
   const lastUpdated = localStorage.getItem(PROFILE_UPDATED_KEY);
   if (lastUpdated) {
     const daysSince = Math.floor((new Date() - new Date(lastUpdated)) / 86400000);
     if (daysSince >= 30) {
-      alerts.push({ type: "accent", icon: "??", msg: "Profile not updated in " + daysSince + " days ó update now so AI generates relevant ideas." });
+      alerts.push({ type: "accent", icon: "??", msg: "Profile not updated in " + daysSince + " days ÔøΩ update now so AI generates relevant ideas." });
     }
   }
   document.getElementById("profileAlerts").innerHTML = alerts.map(a => `
@@ -1774,7 +1864,7 @@ function initProfile() {
   const p = loadProfile();
   renderProfileView(p);
   renderProfileAlerts(p);
-  document.getElementById("profileStatus").textContent = "ó " + (p.client_count || 0) + " clients ∑ " + (p.shoots || 0) + " shoots";
+  document.getElementById("profileStatus").textContent = "ÔøΩ " + (p.client_count || 0) + " clients ÔøΩ " + (p.shoots || 0) + " shoots";
   // Check monthly reminder
   const lastUpdated = localStorage.getItem(PROFILE_UPDATED_KEY);
   if (!lastUpdated) localStorage.setItem(PROFILE_UPDATED_KEY, new Date().toISOString());
@@ -1800,6 +1890,96 @@ CONTENT RULES BASED ON THIS PROFILE:
 - Ideas should reference RGV/South Texas market specifically`;
 }
 // ---- END COMPANY PROFILE ----
+
+// ---- CAPTION GENERATOR ----
+async function generateCaption(i) {
+  if (!currentData) return;
+  const idea = currentData.ideas[i];
+  const btn = document.getElementById('captionBtn_' + i);
+  const out = document.getElementById('captionOut_' + i);
+  if (!btn || !out) return;
+
+  btn.classList.add('loading');
+  btn.querySelector('.caption-spin').style.display = 'inline-block';
+
+  const platform = activePlat;
+  const niche = document.getElementById('niche').value.trim();
+  const audience = document.getElementById('audience').value.trim();
+  const location = document.getElementById('location').value.trim();
+
+  const prompt = `You are a social media copywriter who writes captions that convert viewers into paying clients ‚Äî not just likes and followers.
+
+Platform: ${platform}
+Niche: ${niche}
+Target Audience: ${audience}
+Location: ${location}
+
+Content Idea: ${idea.title}
+Format: ${idea.format}
+Hook: ${idea.hook}
+Emotional Trigger: ${idea.emotional_trigger}
+CTA: ${idea.cta}
+
+Write a single ${platform} caption for this content idea. The caption MUST follow this exact structure:
+
+1. OPENING LINE: An attention-grabbing first line that stops the scroll. Use a pattern interrupt, bold claim, or curiosity gap. This line appears before "...more" so it must be compelling enough to make them expand.
+
+2. BODY COPY (2-3 sentences): Build desire and authority. Use specific proof, paint a picture of the result, or address a pain point the target audience feels right now. Make them think "this is exactly what I need."
+
+3. CALL TO ACTION: A clear, direct CTA that drives DMs or inquiries ‚Äî NOT just "follow for more." Tell them exactly what to do next (DM a specific word, comment a keyword, click the link in bio, etc.) Make it low-friction and high-value.
+
+4. HASHTAGS: 5-7 targeted hashtags. Mix of: 2-3 niche-specific (under 500K posts), 2-3 broader reach, 1-2 location-based. Optimized for ${platform} discovery.
+
+Return ONLY the caption text ready to copy and paste. No labels, no explanations, no markdown. Just the raw caption with line breaks between sections and hashtags at the end.`;
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }],
+        platform: platform,
+        niche: niche,
+        location: location
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const caption = data.content[0].text.trim();
+
+    out.innerHTML = `
+      <div class="caption-output">
+        <div class="caption-output-label">üìù ${escHtml(platform)} Caption</div>
+        <div class="caption-text">${escHtml(caption)}</div>
+        <button class="caption-copy-btn" onclick="copyCaption(this, ${i})">üìã Copy Caption</button>
+      </div>`;
+
+    // Store caption on the idea for copy access
+    currentData.ideas[i]._caption = caption;
+  } catch (e) {
+    out.innerHTML = `<div class="caption-output" style="border-color:rgba(255,77,77,0.3)">
+      <div class="caption-text" style="color:var(--red)">Error generating caption: ${escHtml(e.message)}</div>
+    </div>`;
+  } finally {
+    btn.classList.remove('loading');
+    btn.querySelector('.caption-spin').style.display = 'none';
+  }
+}
+
+function copyCaption(btn, i) {
+  if (!currentData || !currentData.ideas[i]._caption) return;
+  navigator.clipboard.writeText(currentData.ideas[i]._caption).then(() => {
+    btn.textContent = '‚úì Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = 'üìã Copy Caption';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {});
+}
+// ---- END CAPTION GENERATOR ----
 
 initPlatforms();
 initProfile();
