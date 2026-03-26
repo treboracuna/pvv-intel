@@ -550,7 +550,12 @@ async function loadVideos() {
   try {
     const res = await fetch('/api/analytics', { headers: { 'x-account': currentAccount } });
     const videos = await res.json();
-    if (!Array.isArray(videos) || videos.length === 0) return;
+    if (!Array.isArray(videos) || videos.length === 0) {
+      document.getElementById('logWrap').style.display = 'none';
+      document.getElementById('statsWrap').style.display = 'none';
+      document.getElementById('sauceWrap').style.display = 'none';
+      return;
+    }
 
     document.getElementById('logWrap').style.display = 'block';
     document.getElementById('statsWrap').style.display = 'block';
