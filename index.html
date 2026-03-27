@@ -59,15 +59,12 @@ body {
   overflow-x: hidden;
 }
 
-/* GRID BG */
-body::before {
-  content: '';
+/* GLOBE BG */
+#globeCanvas {
   position: fixed;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(16,185,129,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(16,185,129,0.015) 1px, transparent 1px);
-  background-size: 44px 44px;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 0;
 }
@@ -944,6 +941,104 @@ footer {
 </style>
 </head>
 <body>
+<canvas id="globeCanvas"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('globeCanvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, t = 0;
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function drawGlobe(cx, cy, r, rot, tilt, alpha) {
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 0.6;
+
+    // Longitude lines
+    for (let i = 0; i < 12; i++) {
+      const lng = (i / 12) * Math.PI * 2 + rot;
+      ctx.beginPath();
+      for (let j = 0; j <= 60; j++) {
+        const lat = (j / 60) * Math.PI - Math.PI / 2;
+        const x3 = Math.cos(lat) * Math.sin(lng);
+        const y3 = Math.sin(lat) * Math.cos(tilt) - Math.cos(lat) * Math.cos(lng) * Math.sin(tilt);
+        const z3 = Math.sin(lat) * Math.sin(tilt) + Math.cos(lat) * Math.cos(lng) * Math.cos(tilt);
+        if (z3 < -0.05) { ctx.moveTo(cx + x3 * r, cy + y3 * r); continue; }
+        if (j === 0 || z3 < 0) ctx.moveTo(cx + x3 * r, cy + y3 * r);
+        else ctx.lineTo(cx + x3 * r, cy + y3 * r);
+      }
+      ctx.stroke();
+    }
+
+    // Latitude lines
+    for (let i = 1; i < 7; i++) {
+      const lat = (i / 7) * Math.PI - Math.PI / 2;
+      ctx.beginPath();
+      let started = false;
+      for (let j = 0; j <= 80; j++) {
+        const lng = (j / 80) * Math.PI * 2 + rot;
+        const x3 = Math.cos(lat) * Math.sin(lng);
+        const y3 = Math.sin(lat) * Math.cos(tilt) - Math.cos(lat) * Math.cos(lng) * Math.sin(tilt);
+        const z3 = Math.sin(lat) * Math.sin(tilt) + Math.cos(lat) * Math.cos(lng) * Math.cos(tilt);
+        if (z3 < -0.05) { started = false; continue; }
+        if (!started) { ctx.moveTo(cx + x3 * r, cy + y3 * r); started = true; }
+        else ctx.lineTo(cx + x3 * r, cy + y3 * r);
+      }
+      ctx.stroke();
+    }
+
+    // Equator ring (slightly brighter)
+    ctx.globalAlpha = alpha * 1.5;
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    let eqStarted = false;
+    for (let j = 0; j <= 80; j++) {
+      const lng = (j / 80) * Math.PI * 2 + rot;
+      const x3 = Math.sin(lng);
+      const y3 = -Math.cos(lng) * Math.sin(tilt);
+      const z3 = Math.cos(lng) * Math.cos(tilt);
+      if (z3 < -0.05) { eqStarted = false; continue; }
+      if (!eqStarted) { ctx.moveTo(cx + x3 * r, cy + y3 * r); eqStarted = true; }
+      else ctx.lineTo(cx + x3 * r, cy + y3 * r);
+    }
+    ctx.stroke();
+
+    // Outer circle
+    ctx.globalAlpha = alpha * 0.6;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  function frame() {
+    t += 0.002;
+    ctx.clearRect(0, 0, w, h);
+
+    // Main globe — right side
+    const r1 = Math.min(w, h) * 0.35;
+    const cx1 = w * 0.72;
+    const cy1 = h * 0.45;
+    drawGlobe(cx1, cy1, r1, t, 0.4, 0.09);
+
+    // Secondary globe — bottom-left, smaller partial arc
+    const r2 = Math.min(w, h) * 0.18;
+    const cx2 = w * 0.12;
+    const cy2 = h * 0.82;
+    drawGlobe(cx2, cy2, r2, -t * 0.7, -0.3, 0.06);
+
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
 
 <!-- NAV -->
 <nav>
