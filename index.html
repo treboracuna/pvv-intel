@@ -958,7 +958,7 @@ footer {
   function drawGlobe(cx, cy, r, rot, tilt, alpha) {
     ctx.globalAlpha = alpha;
     ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 1.8;
+    ctx.lineWidth = 1.4;
 
     // Longitude lines
     for (let i = 0; i < 18; i++) {
@@ -995,7 +995,7 @@ footer {
 
     // Equator ring (slightly brighter)
     ctx.globalAlpha = alpha * 1.5;
-    ctx.lineWidth = 2.0;
+    ctx.lineWidth = 1.6;
     ctx.beginPath();
     let eqStarted = false;
     for (let j = 0; j <= 80; j++) {
@@ -1011,27 +1011,27 @@ footer {
 
     // Outer circle
     ctx.globalAlpha = alpha * 0.6;
-    ctx.lineWidth = 1.8;
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.stroke();
   }
 
   function frame() {
-    t += 0.0028;
+    t += 0.00224;
     ctx.clearRect(0, 0, w, h);
 
     // Main globe — right side
     const r1 = Math.min(w, h) * 0.35;
     const cx1 = w * 0.72;
     const cy1 = h * 0.45;
-    drawGlobe(cx1, cy1, r1, t, 0.4, 0.6);
+    drawGlobe(cx1, cy1, r1, t, 0.4, 0.45);
 
     // Secondary globe — bottom-left, smaller partial arc
     const r2 = Math.min(w, h) * 0.18;
     const cx2 = w * 0.12;
     const cy2 = h * 0.82;
-    drawGlobe(cx2, cy2, r2, -t * 0.7, -0.3, 0.6);
+    drawGlobe(cx2, cy2, r2, -t * 0.7, -0.3, 0.45);
 
     ctx.globalAlpha = 1;
     requestAnimationFrame(frame);
