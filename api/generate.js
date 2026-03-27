@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { model, max_tokens, messages, platform, niche, location } = req.body;
+    const { model, max_tokens, messages, platform, niche, location, fetchHashtags } = req.body;
     const loc = location || 'Texas';
     const plat = platform || 'Instagram Reels';
     const now = new Date().toISOString().slice(0, 10);
@@ -88,7 +88,39 @@ export default async function handler(req, res) {
       } catch (e) {}
     }
 
-    const fullContext = [trendContext, audioContext, radarContext, algoContext, timeContext].join('')
+    let hashtagContext = '';
+    if (fetchHashtags && process.env.BRAVE_API_KEY) {
+      try {
+        const braveGet = (q, freshness = 'pw', count = 5) =>
+          fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(q)}&count=${count}&freshness=${freshness}`, {
+            headers: {
+              'Accept': 'application/json',
+              'Accept-Encoding': 'gzip',
+              'X-Subscription-Token': process.env.BRAVE_API_KEY
+            }
+          }).then(r => r.json()).catch(() => null);
+
+        const hashtagResults = await Promise.all([
+          braveGet(`trending hashtags ${niche || 'business'} ${plat} ${now}`, 'pw', 5),
+          braveGet(`best hashtags for ${niche || 'business'} ${plat} 2026 high reach`, 'pw', 5),
+          braveGet(`${plat} hashtag strategy ${niche || 'business'} viral reach ${now}`, 'pw', 5),
+          braveGet(`top performing hashtags ${niche || 'business'} content creators ${plat}`, 'pm', 5),
+          braveGet(`niche hashtags ${niche || 'business'} ${loc} ${plat} under 500k posts`, 'pm', 5)
+        ]);
+
+        const hashtagSnippets = hashtagResults
+          .filter(Boolean)
+          .flatMap(r => (r.web?.results || []).map(x => `${x.title}: ${x.description || ''}`).filter(Boolean))
+          .slice(0, 15)
+          .join('\n');
+
+        if (hashtagSnippets) {
+          hashtagContext = `\n\nLIVE TRENDING HASHTAG DATA (${now}):\n${hashtagSnippets}`;
+        }
+      } catch (e) {}
+    }
+
+    const fullContext = [trendContext, audioContext, radarContext, algoContext, timeContext, hashtagContext].join('')
       ? [trendContext, audioContext, radarContext, algoContext, timeContext].join('') + `
 
 CRITICAL INSTRUCTIONS — use ALL of this live data:
@@ -123,7 +155,8 @@ CRITICAL INSTRUCTIONS — use ALL of this live data:
       _audio_data_used: !!audioContext,
       _radar_used: !!radarContext,
       _algo_used: !!algoContext,
-      _time_used: !!timeContext
+      _time_used: !!timeContext,
+      _hashtag_data_used: !!hashtagContext
     });
 
   } catch (err) {

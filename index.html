@@ -2238,7 +2238,11 @@ Write a single ${platform} caption for this content idea. The caption MUST follo
 
 3. CALL TO ACTION: A clear, direct CTA that drives agent DMs or inquiries — NOT just "follow for more." Tell the agent exactly what to do next (DM a specific word, comment a keyword, click the link in bio, etc.) Make it low-friction and high-value.
 
-4. HASHTAGS: 5-7 targeted hashtags. Mix of: 2-3 niche-specific (under 500K posts), 2-3 broader reach, 1-2 location-based. Optimized for ${platform} discovery.
+4. HASHTAGS: Recommend exactly 15 hashtags split into 3 tiers:
+   - TIER 1 (5 hashtags): Niche-specific, under 500K posts — these are targeted discovery hashtags for ${niche} on ${platform}
+   - TIER 2 (5 hashtags): Mid-reach, 500K–5M posts — broader but still relevant to the content topic
+   - TIER 3 (5 hashtags): High-reach, 5M+ posts — maximum exposure hashtags that fit the content
+   If LIVE TRENDING HASHTAG DATA is provided below, prioritize hashtags from that data that are currently active and gaining traction. Only use hashtags that are real and currently in use on ${platform}. Format all 15 hashtags in a single line at the end of the caption.
 
 CRITICAL: Never fabricate specific statistics, sale prices, days on market, or client results. Do not invent proof points like '$450K sold in 3 days' or similar. If proof is needed, use general positioning statements like 'our clients consistently win more listings' or ask the viewer a question instead. Only use facts that come from the idea context provided.
 
@@ -2250,11 +2254,12 @@ Return ONLY the caption text ready to copy and paste. No labels, no explanations
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
+        max_tokens: 1200,
         messages: [{ role: 'user', content: prompt }],
         platform: platform,
         niche: niche,
-        location: location
+        location: location,
+        fetchHashtags: true
       })
     });
     const data = await res.json();
