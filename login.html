@@ -9,10 +9,10 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #07090d; --surface: #0c0f15; --surface2: #11151d;
-  --border: #1a2030; --accent: #d4f53c; --accent-dim: rgba(212,245,60,0.08);
-  --green: #2ecc8a; --red: #ff4d4d; --red-dim: rgba(255,77,77,0.08);
-  --text: #dde2ee; --muted: #4a5568;
+  --bg: #0a0a0a; --surface: #111111; --surface2: #1a1a1a;
+  --border: #1f2d27; --accent: #10b981; --accent-dim: rgba(16,185,129,0.08);
+  --green: #10b981; --red: #ff4d4d; --red-dim: rgba(255,77,77,0.08);
+  --text: #f5f5f5; --muted: #a3a3a3;
 }
 body {
   background: var(--bg); color: var(--text);
@@ -21,7 +21,7 @@ body {
 }
 body::before {
   content: ""; position: fixed; inset: 0;
-  background-image: linear-gradient(rgba(212,245,60,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(212,245,60,0.025) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(16,185,129,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.015) 1px, transparent 1px);
   background-size: 44px 44px; pointer-events: none; z-index: 0;
 }
 .login-wrap { position: relative; z-index: 1; width: 100%; max-width: 420px; padding: 20px; }
@@ -49,12 +49,12 @@ body::before {
   border-radius: 6px; cursor: pointer; transition: all 0.15s;
   display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px;
 }
-.login-btn:hover:not(:disabled) { background: #e8ff60; }
+.login-btn:hover:not(:disabled) { background: #059669; }
 .login-btn:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinner { width: 13px; height: 13px; border: 2px solid rgba(0,0,0,0.3); border-top-color: #000; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
 .error-msg { background: var(--red-dim); border: 1px solid rgba(255,77,77,0.25); border-radius: 6px; padding: 12px 16px; color: var(--red); font-size: 13px; margin-bottom: 16px; font-family: "IBM Plex Mono", monospace; display: none; }
-.lock-icon { width: 48px; height: 48px; background: var(--accent-dim); border: 1px solid rgba(212,245,60,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 20px; }
+.lock-icon { width: 48px; height: 48px; background: var(--accent-dim); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 20px; }
 
 /* TEAM PANEL */
 .team-wrap { position: relative; z-index: 1; width: 100%; max-width: 420px; padding: 0 20px 20px; }
@@ -63,12 +63,12 @@ body::before {
 .team-title span { color: var(--accent); }
 .member-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
 .member-row:last-of-type { border-bottom: none; }
-.member-avatar { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-dim); border: 1px solid rgba(212,245,60,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--accent); flex-shrink: 0; }
+.member-avatar { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-dim); border: 1px solid rgba(16,185,129,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--accent); flex-shrink: 0; }
 .member-info { flex: 1; }
 .member-email { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--text); }
 .member-status { font-size: 10px; color: var(--muted); margin-top: 2px; }
 .member-status.confirmed { color: var(--green); }
-.member-status.pending { color: var(--orange, #ff8c3a); }
+.member-status.pending { color: var(--orange, #f59e0b); }
 .member-actions { display: flex; gap: 6px; }
 .member-btn { padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; font-family: "Syne", sans-serif; }
 .btn-invite { background: transparent; border: 1px solid var(--border); color: var(--muted); }
@@ -79,7 +79,7 @@ body::before {
 .add-member-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: "IBM Plex Mono", monospace; font-size: 12px; padding: 8px 12px; border-radius: 5px; outline: none; transition: border-color 0.15s; }
 .add-member-input:focus { border-color: var(--accent); }
 .btn-add { padding: 8px 14px; background: var(--accent); color: #000; border: none; border-radius: 5px; font-family: "Syne", sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-.btn-add:hover { background: #e8ff60; }
+.btn-add:hover { background: #059669; }
 .team-msg { font-size: 11px; font-family: "IBM Plex Mono", monospace; margin-top: 10px; display: none; }
 .team-msg.success { color: var(--green); }
 .team-msg.error { color: var(--red); }

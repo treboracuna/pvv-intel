@@ -32,21 +32,21 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #080600;
-  --surface: #0f0d00;
-  --surface2: #161200;
-  --border: #2a2200;
-  --border2: #3d3300;
-  --accent: #c9a84c;
-  --accent-dim: rgba(201,168,76,0.08);
-  --green: #c9a84c;
-  --green-dim: rgba(201,168,76,0.08);
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --border: #1f2d27;
+  --border2: #2a3f32;
+  --accent: #10b981;
+  --accent-dim: rgba(16,185,129,0.08);
+  --green: #10b981;
+  --green-dim: rgba(16,185,129,0.08);
   --red: #ff4d4d;
   --red-dim: rgba(255,77,77,0.08);
-  --orange: #e8b84b;
-  --text: #f0e6cc;
-  --muted: #6b5d3f;
-  --muted2: #3d3320;
+  --orange: #f59e0b;
+  --text: #f5f5f5;
+  --muted: #a3a3a3;
+  --muted2: #404040;
 }
 
 html { scroll-behavior: smooth; }
@@ -65,8 +65,8 @@ body::before {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(201,168,76,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201,168,76,0.015) 1px, transparent 1px);
+    linear-gradient(rgba(16,185,129,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16,185,129,0.015) 1px, transparent 1px);
   background-size: 44px 44px;
   pointer-events: none;
   z-index: 0;
@@ -77,7 +77,7 @@ nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(8,6,0,0.95);
+  background: rgba(10,10,10,0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   padding: 0 32px;
@@ -126,7 +126,7 @@ nav {
   font-size: 11px;
   color: var(--accent);
   background: var(--accent-dim);
-  border: 1px solid rgba(201,168,76,0.2);
+  border: 1px solid rgba(16,185,129,0.2);
   padding: 5px 14px;
   border-radius: 20px;
   margin-bottom: 28px;
@@ -169,7 +169,7 @@ nav {
   transition: all 0.15s;
   text-decoration: none;
 }
-.hero-cta:hover { background: #d4b85c; transform: translateY(-1px); }
+.hero-cta:hover { background: #059669; transform: translateY(-1px); }
 
 /* MAIN CONTAINER */
 .container {
@@ -353,7 +353,7 @@ select option { background: var(--surface2); }
   flex-shrink: 0;
 }
 .trend-cat-format { background: var(--accent-dim); color: var(--accent); }
-.trend-cat-hook { background: rgba(255,140,58,0.1); color: var(--orange); }
+.trend-cat-hook { background: rgba(245,158,11,0.1); color: var(--orange); }
 .trend-cat-audio { background: rgba(168,85,247,0.1); color: #a855f7; }
 .trend-cat-creator_move { background: var(--green-dim); color: var(--green); }
 .trend-cat-algorithm { background: rgba(59,130,246,0.1); color: #3b82f6; }
@@ -399,7 +399,7 @@ select option { background: var(--surface2); }
   justify-content: center;
   gap: 10px;
 }
-.run-btn:hover:not(:disabled) { background: #d4b85c; }
+.run-btn:hover:not(:disabled) { background: #059669; }
 .run-btn:active:not(:disabled) { transform: scale(0.98); }
 .run-btn:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -518,7 +518,7 @@ select option { background: var(--surface2); }
 .tag-green { background: var(--green-dim); color: var(--green); }
 .tag-accent { background: var(--accent-dim); color: var(--accent); }
 .tag-red { background: var(--red-dim); color: var(--red); }
-.tag-orange { background: rgba(255,140,58,0.1); color: var(--orange); }
+.tag-orange { background: rgba(245,158,11,0.1); color: var(--orange); }
 .chevron {
   font-size: 11px;
   color: var(--muted);
@@ -538,14 +538,14 @@ select option { background: var(--surface2); }
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #a08c5a;
+  color: #6b8f7b;
   margin-bottom: 9px;
   border-left: 2px solid var(--accent);
   padding-left: 10px;
 }
 .hook-box {
   background: var(--surface2);
-  border-left: 3px solid #c9a84c;
+  border-left: 3px solid #10b981;
   padding: 13px 17px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 14px;
@@ -571,7 +571,7 @@ select option { background: var(--surface2); }
 .why-box {
   background: var(--green-dim);
   border: none;
-  border-left: 3px solid #c9a84c;
+  border-left: 3px solid #10b981;
   padding: 13px 17px;
   border-radius: 0 6px 6px 0;
   font-size: 14px;
@@ -698,7 +698,7 @@ footer {
 @media(max-width:600px){ .cal-grid { grid-template-columns: 1fr; } }
 .cal-day { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; min-height: 120px; transition: border-color 0.2s; }
 .cal-day.has-content { border-color: var(--border2); }
-.cal-day.today { border-color: rgba(201,168,76,0.3); }
+.cal-day.today { border-color: rgba(16,185,129,0.3); }
 .cal-day.today .cal-day-name { color: var(--accent); }
 .cal-day-name { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
 .cal-day-date { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 10px; }
@@ -714,7 +714,7 @@ footer {
 .cal-action-btn { padding: 9px 18px; background: transparent; border: 1px solid var(--border2); color: var(--muted); font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 5px; cursor: pointer; transition: all 0.15s; }
 .cal-action-btn:hover { border-color: var(--accent); color: var(--accent); }
 .cal-action-btn.cal-primary { background: var(--accent); color: #000; border-color: var(--accent); }
-.cal-action-btn.cal-primary:hover { background: #d4b85c; }
+.cal-action-btn.cal-primary:hover { background: #059669; }
 
 .intel-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 24px; }
 .intel-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
@@ -724,14 +724,14 @@ footer {
 .intel-item { font-size: 13px; color: var(--text); line-height: 1.5; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: flex-start; }
 .intel-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
 .intel-bullet { flex-shrink: 0; margin-top: 5px; width: 6px; height: 6px; border-radius: 50%; }
-.bullet-rising { background: #c9a84c; }
-.bullet-emerging { background: #e8b84b; }
-.bullet-algo { background: #ff8c3a; }
+.bullet-rising { background: #10b981; }
+.bullet-emerging { background: #f59e0b; }
+.bullet-algo { background: #f59e0b; }
 .momentum-badge { display: inline-flex; align-items: center; font-family: "IBM Plex Mono", monospace; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
-.momentum-rising { background: rgba(201,168,76,0.12); color: #c9a84c; }
-.momentum-emerging { background: rgba(201,168,76,0.1); color: #e8b84b; }
-.momentum-peaked { background: rgba(255,140,58,0.1); color: #ff8c3a; }
-.time-badge { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(201,168,76,0.15); padding: 3px 10px; border-radius: 4px; display: inline-block; margin-top: 5px; }
+.momentum-rising { background: rgba(16,185,129,0.12); color: #10b981; }
+.momentum-emerging { background: rgba(16,185,129,0.1); color: #f59e0b; }
+.momentum-peaked { background: rgba(245,158,11,0.1); color: #f59e0b; }
+.time-badge { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(16,185,129,0.15); padding: 3px 10px; border-radius: 4px; display: inline-block; margin-top: 5px; }
 
 .broll-list { display: flex; flex-direction: column; gap: 8px; }
 .broll-item { display: flex; gap: 12px; align-items: flex-start; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; }
@@ -849,7 +849,7 @@ footer {
 .script-hook { background: var(--surface2); border-left: 3px solid var(--accent); padding: 12px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--accent); border-radius: 0 5px 5px 0; line-height: 1.55; position: relative; }
 .script-body-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; font-size: 13px; color: var(--text); line-height: 1.55; display: flex; gap: 10px; align-items: flex-start; }
 .script-line-num { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); flex-shrink: 0; min-width: 20px; margin-top: 2px; }
-.script-cta { background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.2); border-radius: 6px; padding: 12px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--green); line-height: 1.55; }
+.script-cta { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 6px; padding: 12px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--green); line-height: 1.55; }
 .script-copy-all { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 7px 14px; background: transparent; border: 1px solid var(--border2); color: var(--muted); font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 5px; cursor: pointer; transition: all 0.15s; }
 .script-copy-all:hover { border-color: var(--accent); color: var(--accent); }
 @media(max-width:768px) {
@@ -933,7 +933,7 @@ footer {
   cursor: pointer;
   transition: all 0.15s;
 }
-.caption-copy-btn:hover { background: #d4b85c; }
+.caption-copy-btn:hover { background: #059669; }
 .caption-copy-btn.copied { background: var(--green); }
 @media(max-width:768px) {
   .caption-btn { margin-left: 0; margin-top: 10px; font-size: 10px; padding: 7px 12px; }
@@ -949,11 +949,11 @@ footer {
 <nav>
   <div class="nav-logo">PVV <span>/ Viral Growth Intel</span></div>
   <div style="display:flex;align-items:center;gap:20px">
-    <a href="/analytics.html" style="font-size:11px;color:var(--muted);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.15s" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='#6b5d3f'">Analytics</a>
+    <a href="/analytics.html" style="font-size:11px;color:var(--muted);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.15s" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#a3a3a3'">Analytics</a>
     <div style="display:flex;align-items:center;gap:14px">
-      <a href="/analytics.html" style="display:inline-flex;align-items:center;gap:7px;padding:7px 16px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#c9a84c;text-decoration:none;transition:all 0.15s" onmouseover="this.style.background='rgba(201,168,76,0.18)'" onmouseout="this.style.background='rgba(201,168,76,0.08)'">📊 Analytics</a>
+      <a href="/analytics.html" style="display:inline-flex;align-items:center;gap:7px;padding:7px 16px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#10b981;text-decoration:none;transition:all 0.15s" onmouseover="this.style.background='rgba(16,185,129,0.18)'" onmouseout="this.style.background='rgba(16,185,129,0.08)'">📊 Analytics</a>
       <div class="nav-status"><span class="pulse-dot"></span> System Live</div>
-      <button onclick="_logout()" style="font-size:11px;color:var(--muted);background:transparent;border:1px solid var(--border);padding:6px 14px;border-radius:4px;cursor:pointer;font-family:Syne,sans-serif;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.15s" onmouseover="this.style.color='#ff4d4d';this.style.borderColor='#ff4d4d'" onmouseout="this.style.color='#4a5568';this.style.borderColor='#1a2030'">Logout</button>
+      <button onclick="_logout()" style="font-size:11px;color:var(--muted);background:transparent;border:1px solid var(--border);padding:6px 14px;border-radius:4px;cursor:pointer;font-family:Syne,sans-serif;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.15s" onmouseover="this.style.color='#ff4d4d';this.style.borderColor='#ff4d4d'" onmouseout="this.style.color='#a3a3a3';this.style.borderColor='#1f2d27'">Logout</button>
     </div>
   </div>
 </nav>
@@ -1360,7 +1360,7 @@ function renderResults(data) {
           <span class="tag tag-green">${escHtml(idea.format)}</span>
           ${idea.fire_factor === 'HIGH' ? '<span class="tag tag-red">🔥 High</span>' : ''}
           ${idea.momentum_signal ? `<span class="momentum-badge momentum-${(idea.momentum_signal||'rising').toLowerCase()}">${escHtml(idea.momentum_signal)}</span>` : ''}
-          ${idea.viral_score ? `<span class="tag" style="background:${idea.viral_score>=80?'rgba(201,168,76,0.15)':idea.viral_score>=60?'rgba(201,168,76,0.1)':'rgba(255,140,58,0.1)'};color:${idea.viral_score>=80?'#c9a84c':idea.viral_score>=60?'#e8b84b':'#ff8c3a'}">⚡ ${idea.viral_score}</span>` : ''}
+          ${idea.viral_score ? `<span class="tag" style="background:${idea.viral_score>=80?'rgba(16,185,129,0.15)':idea.viral_score>=60?'rgba(16,185,129,0.1)':'rgba(245,158,11,0.1)'};color:${idea.viral_score>=80?'#10b981':idea.viral_score>=60?'#059669':'#f59e0b'}">⚡ ${idea.viral_score}</span>` : ''}
         </div>
         <span class="chevron">▼</span>
       </div>
@@ -1391,9 +1391,9 @@ function renderResults(data) {
         <div class="vscore-wrap">
           <span class="vscore-label">Viral Score</span>
           <div class="vscore-bar-wrap">
-            <div class="vscore-bar" style="width:${idea.viral_score}%;background:${idea.viral_score>=80?'#c9a84c':idea.viral_score>=60?'#e8b84b':'#ff8c3a'}"></div>
+            <div class="vscore-bar" style="width:${idea.viral_score}%;background:${idea.viral_score>=80?'#10b981':idea.viral_score>=60?'#059669':'#f59e0b'}"></div>
           </div>
-          <span class="vscore-num" style="color:${idea.viral_score>=80?'#c9a84c':idea.viral_score>=60?'#e8b84b':'#ff8c3a'}">${idea.viral_score}<span style="font-size:11px;color:var(--muted)">/100</span></span>
+          <span class="vscore-num" style="color:${idea.viral_score>=80?'#10b981':idea.viral_score>=60?'#059669':'#f59e0b'}">${idea.viral_score}<span style="font-size:11px;color:var(--muted)">/100</span></span>
         </div>` : ''}
         <div class="cblock">
           <div class="cblock-label">Why It Performs</div>
@@ -1492,8 +1492,8 @@ function renderResults(data) {
   el.style.display = 'block';
   if (window._trendUsed) {
     const badge = document.createElement('div');
-    badge.style.cssText = 'display:inline-flex;align-items:center;gap:6px;font-family:IBM Plex Mono,monospace;font-size:11px;color:#c9a84c;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);padding:5px 12px;border-radius:20px;margin-bottom:16px;';
-    badge.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#c9a84c;display:inline-block"></span> Live trend + audio data used';
+    badge.style.cssText = 'display:inline-flex;align-items:center;gap:6px;font-family:IBM Plex Mono,monospace;font-size:11px;color:#10b981;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);padding:5px 12px;border-radius:20px;margin-bottom:16px;';
+    badge.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#10b981;display:inline-block"></span> Live trend + audio data used';
     el.prepend(badge);
   }
   renderIntelligence(data.patterns);
@@ -1837,7 +1837,7 @@ function renderCalendar() {
           <div class="cal-idea-title">${escHtml(idea.title)}</div>
           <div class="cal-idea-tags">
             <span class="tag tag-green" style="font-size:9px">${escHtml(idea.format||'')}</span>
-            ${idea.viral_score ? `<span class="cal-idea-score" style="color:${idea.viral_score>=80?'#c9a84c':idea.viral_score>=60?'#e8b84b':'#ff8c3a'}">⚡${idea.viral_score}</span>` : ''}
+            ${idea.viral_score ? `<span class="cal-idea-score" style="color:${idea.viral_score>=80?'#10b981':idea.viral_score>=60?'#059669':'#f59e0b'}">⚡${idea.viral_score}</span>` : ''}
           </div>
           <button class="cal-post-btn${idea.posted?' done':''}" onclick="markPosted('${d.iso}',${idx})">
             ${idea.posted ? '✓ Posted' : 'Mark as Posted'}
