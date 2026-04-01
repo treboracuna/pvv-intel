@@ -1668,7 +1668,7 @@ CRITICAL RULES — every single idea MUST include ALL fields or the response is 
     window._trendUsed = data._trend_data_used || false;
     window._lastPatterns = currentData ? currentData.patterns : null;
     const raw = data.content[0].text.trim().replace(/```json|```/g, '').trim();
-    currentData = JSON.parse(raw);
+    currentData = safeParseJSON(raw);
     renderResults(currentData);
     setLoading(false);
   } catch (e) {
@@ -2042,6 +2042,53 @@ function exportAll() {
   a.href = URL.createObjectURL(blob);
   a.download = `pvv-content-plan-${Date.now()}.txt`;
   a.click();
+}
+
+function safeParseJSON(str) {
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    // Attempt to repair truncated or malformed JSON
+    let s = str;
+    // Remove trailing comma before closing brackets
+    s = s.replace(/,\s*([}\]])/g, '$1');
+    // Fix unterminated strings: find last unmatched quote and close it
+    let inStr = false, lastQuoteIdx = -1;
+    for (let i = 0; i < s.length; i++) {
+      if (s[i] === '"' && (i === 0 || s[i-1] !== '\\')) {
+        inStr = !inStr;
+        if (inStr) lastQuoteIdx = i;
+      }
+    }
+    if (inStr && lastQuoteIdx >= 0) {
+      // Strip the unterminated string value back to the last quote and close it
+      s = s.slice(0, s.length) + '"';
+    }
+    // Count and close unclosed brackets/braces
+    let braces = 0, brackets = 0;
+    let inString = false;
+    for (let i = 0; i < s.length; i++) {
+      if (s[i] === '"' && (i === 0 || s[i-1] !== '\\')) inString = !inString;
+      if (inString) continue;
+      if (s[i] === '{') braces++;
+      if (s[i] === '}') braces--;
+      if (s[i] === '[') brackets++;
+      if (s[i] === ']') brackets--;
+    }
+    // Remove any trailing partial key-value pair (ends with colon or comma without value)
+    s = s.replace(/,\s*"[^"]*"\s*:\s*$/, '');
+    s = s.replace(/,\s*$/, '');
+    // Close unclosed brackets and braces
+    while (brackets > 0) { s += ']'; brackets--; }
+    while (braces > 0) { s += '}'; braces--; }
+    // Remove trailing commas again after repair
+    s = s.replace(/,\s*([}\]])/g, '$1');
+    try {
+      return JSON.parse(s);
+    } catch (e2) {
+      throw new Error('Failed to parse AI response as JSON. The response may have been truncated.');
+    }
+  }
 }
 
 function escHtml(str) {

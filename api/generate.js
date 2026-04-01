@@ -145,7 +145,7 @@ CRITICAL INSTRUCTIONS — use ALL of this live data:
         'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({ model, max_tokens, messages: updatedMessages })
+      body: JSON.stringify({ model, max_tokens: Math.max(max_tokens || 0, 4000), messages: updatedMessages })
     });
 
     const data = await response.json();
