@@ -938,6 +938,227 @@ footer {
   .caption-text { font-size: 12px; }
   .caption-copy-btn { font-size: 10px; padding: 7px 12px; }
 }
+
+/* HOOK & VIRAL RECOMMENDATIONS */
+.rec-block {
+  margin-top: 18px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  animation: fadein 0.3s ease forwards;
+}
+.rec-block + .rec-block { margin-top: 10px; }
+.rec-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.rec-label.viral-label { color: #a855f7; }
+.rec-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.rec-principle {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+.rec-example {
+  background: rgba(16,185,129,0.06);
+  border-left: 3px solid var(--accent);
+  padding: 10px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--accent);
+  border-radius: 0 5px 5px 0;
+  line-height: 1.55;
+}
+.rec-example.viral-example {
+  border-left-color: #a855f7;
+  color: #a855f7;
+  background: rgba(168,85,247,0.06);
+}
+.rec-why {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+.rec-exec {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.55;
+}
+
+/* MODAL OVERLAY */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal-panel {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  width: 90vw;
+  max-width: 680px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  animation: fadein 0.25s ease;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.15s;
+}
+.modal-close:hover { color: var(--red); }
+.modal-search {
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-search input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.modal-search input:focus { border-color: var(--accent); }
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 24px 24px;
+}
+.modal-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+.modal-item:hover { border-color: var(--border2); }
+.modal-item-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.modal-item-principle {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.modal-item-example {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--accent);
+  line-height: 1.5;
+  background: var(--accent-dim);
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+.modal-item-example.purple {
+  color: #a855f7;
+  background: rgba(168,85,247,0.08);
+}
+.modal-item-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.modal-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* LIBRARY BUTTONS */
+.lib-btn-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.lib-btn {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.lib-btn:hover { border-color: var(--accent); color: var(--accent); }
+.lib-btn.purple:hover { border-color: #a855f7; color: #a855f7; }
+
+@media(max-width:768px) {
+  .rec-block { padding: 14px; }
+  .rec-name { font-size: 13px; }
+  .rec-example { font-size: 12px; padding: 8px 12px; }
+  .modal-panel { width: 96vw; max-height: 85vh; }
+  .modal-header { padding: 16px 18px; }
+  .modal-body { padding: 12px 18px 18px; }
+  .lib-btn-row { flex-wrap: wrap; }
+  .lib-btn { font-size: 10px; padding: 8px 14px; }
+}
 </style>
 </head>
 <body>
@@ -1168,6 +1389,12 @@ footer {
     </button>
   </div>
 
+  <!-- LIBRARY BUTTONS -->
+  <div class="lib-btn-row">
+    <button class="lib-btn" onclick="openModal('hookModal')">🧠 Hook Library</button>
+    <button class="lib-btn purple" onclick="openModal('viralModal')">🔥 Viral Formats</button>
+  </div>
+
   <!-- ERROR -->
   <div class="error-box" id="errBox" style="display:none"></div>
 
@@ -1205,6 +1432,34 @@ footer {
       </div>
       <div id="hookLibList"></div>
     </div>
+  </div>
+</div>
+
+<!-- HOOK LIBRARY MODAL -->
+<div class="modal-overlay" id="hookModal">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div class="modal-title">Hook Psychology Library</div>
+      <button class="modal-close" onclick="closeModal('hookModal')">✕</button>
+    </div>
+    <div class="modal-search">
+      <input type="text" id="hookModalSearch" placeholder="Search hooks by name, trigger, or niche..." oninput="filterModalHooks()">
+    </div>
+    <div class="modal-body" id="hookModalBody"></div>
+  </div>
+</div>
+
+<!-- VIRAL FORMATS MODAL -->
+<div class="modal-overlay" id="viralModal">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div class="modal-title">Viral Format Library</div>
+      <button class="modal-close" onclick="closeModal('viralModal')">✕</button>
+    </div>
+    <div class="modal-search">
+      <input type="text" id="viralModalSearch" placeholder="Search formats by name, goal, or type..." oninput="filterModalFormats()">
+    </div>
+    <div class="modal-body" id="viralModalBody"></div>
   </div>
 </div>
 
@@ -1547,6 +1802,7 @@ function renderResults(data) {
           <button class="caption-btn" id="captionBtn_${i}" onclick="generateCaption(${i})"><span class="caption-spin"></span> Generate Caption</button>
         </div>
         <div id="captionOut_${i}"></div>
+        ${buildRecommendationHTML(idea)}
       </div>
     </div>`).join('');
 
@@ -2297,6 +2553,465 @@ function copyCaption(btn, i) {
   }).catch(() => {});
 }
 // ---- END CAPTION GENERATOR ----
+
+// ---- HOOK PSYCHOLOGY DATABASE ----
+const HOOK_LIBRARY = [
+  {
+    name: "Curiosity Gap",
+    principle: "The brain cannot rest with an incomplete pattern. Opening a loop (unanswered question) triggers dopamine-driven seeking behavior, forcing the viewer to keep watching to close the gap.",
+    triggers: ["curiosity"],
+    goals: ["brand awareness", "authority positioning", "lead generation", "inbound clients"],
+    formats: ["hot take", "pov", "storytime", "behind the scenes", "reveal", "myth busting"],
+    tones: ["provocative", "mysterious", "teasing"],
+    example: "Nobody talks about [hidden thing] in [niche]... here's what I found"
+  },
+  {
+    name: "Pattern Interrupt",
+    principle: "The reticular activating system filters out expected stimuli. A sudden break from what the viewer expects — visually, verbally, or contextually — forces the brain to re-engage and pay full attention.",
+    triggers: ["curiosity", "FOMO"],
+    goals: ["brand awareness", "inbound clients", "lead generation"],
+    formats: ["hot take", "before/after", "pov", "day in the life", "myth busting"],
+    tones: ["bold", "surprising", "contrarian"],
+    example: "Stop doing [common practice]. It's costing you [specific loss]."
+  },
+  {
+    name: "Social Proof Cascade",
+    principle: "Informational social influence — when uncertain, people look to others' actions as evidence of the correct choice. Showing real results or real clients removes the cognitive burden of evaluation.",
+    triggers: ["social proof", "status"],
+    goals: ["inbound clients", "authority positioning", "lead generation"],
+    formats: ["before/after", "client results", "testimonial", "case study", "transformation"],
+    tones: ["confident", "authoritative", "proof-driven"],
+    example: "Here's exactly what happened when [real client] started [specific action]"
+  },
+  {
+    name: "Loss Aversion Trigger",
+    principle: "Kahneman's prospect theory: losses are felt 2x more intensely than equivalent gains. Framing the hook around what the viewer stands to lose — not gain — creates urgent, emotional engagement.",
+    triggers: ["FOMO", "fear"],
+    goals: ["inbound clients", "lead generation"],
+    formats: ["hot take", "myth busting", "educational", "listicle"],
+    tones: ["urgent", "warning", "serious"],
+    example: "You're losing [specific thing] every day you don't [action]. Here's the math."
+  },
+  {
+    name: "Authority Anchoring",
+    principle: "The anchoring heuristic causes people to weight the first piece of information disproportionately. Leading with a credential, result, or status marker sets the frame for everything that follows.",
+    triggers: ["status", "social proof", "aspiration"],
+    goals: ["authority positioning", "inbound clients"],
+    formats: ["day in the life", "pov", "storytime", "behind the scenes", "educational"],
+    tones: ["premium", "confident", "authoritative", "luxury"],
+    example: "After [impressive credential/number], here's the one thing I changed that made the biggest difference"
+  },
+  {
+    name: "Identity Mirror",
+    principle: "Self-referencing effect: people process information more deeply when it relates to their own identity. Calling out exactly who the viewer is makes them feel 'this was made for me' and stops the scroll.",
+    triggers: ["aspiration", "status"],
+    goals: ["inbound clients", "lead generation", "brand awareness"],
+    formats: ["pov", "hot take", "listicle", "educational", "day in the life"],
+    tones: ["relatable", "direct", "personal"],
+    example: "If you're a [exact viewer identity] who [specific behavior], watch this"
+  },
+  {
+    name: "Scarcity & Urgency",
+    principle: "Commodity theory: things perceived as rare are valued higher. Adding time pressure or limited availability bypasses deliberation and triggers immediate action-oriented processing.",
+    triggers: ["FOMO", "fear"],
+    goals: ["lead generation", "inbound clients"],
+    formats: ["hot take", "behind the scenes", "reveal", "listicle"],
+    tones: ["urgent", "exclusive", "time-sensitive"],
+    example: "This won't last — [specific scarce thing] in [niche] is about to change"
+  },
+  {
+    name: "Emotional Contrast",
+    principle: "The contrast effect amplifies perception when two opposing states are placed side by side. Showing the gap between current pain and desired outcome creates emotional momentum toward action.",
+    triggers: ["aspiration", "FOMO"],
+    goals: ["inbound clients", "brand awareness", "lead generation"],
+    formats: ["before/after", "transformation", "client results", "pov"],
+    tones: ["inspirational", "dramatic", "cinematic"],
+    example: "This is what [thing] looked like 30 days ago vs. today"
+  },
+  {
+    name: "Specificity Bias",
+    principle: "Specific details activate the hippocampus more than vague claims — they feel more real, more credible, and more memorable. Precise numbers and details signal insider knowledge.",
+    triggers: ["curiosity", "social proof"],
+    goals: ["authority positioning", "lead generation", "inbound clients"],
+    formats: ["educational", "listicle", "case study", "hot take", "myth busting"],
+    tones: ["data-driven", "analytical", "insider"],
+    example: "The exact [number]-step process that generated [specific result] in [timeframe]"
+  },
+  {
+    name: "Forbidden Knowledge",
+    principle: "The Streisand effect meets reactance theory: telling people they shouldn't know something makes them desperate to know it. Forbidden framing signals high-value insider information.",
+    triggers: ["curiosity", "FOMO", "status"],
+    goals: ["brand awareness", "authority positioning", "lead generation"],
+    formats: ["hot take", "myth busting", "storytime", "educational", "reveal"],
+    tones: ["secretive", "controversial", "insider"],
+    example: "I probably shouldn't be showing you this... but here's what [industry insiders] don't want you to know"
+  },
+  {
+    name: "Aspirational Projection",
+    principle: "Mental simulation theory: when people vividly imagine a future self, the brain processes it almost identically to memory. Painting the 'after' state makes the viewer emotionally experience the outcome.",
+    triggers: ["aspiration", "status"],
+    goals: ["inbound clients", "brand awareness", "authority positioning"],
+    formats: ["day in the life", "pov", "before/after", "transformation", "behind the scenes"],
+    tones: ["luxury", "aspirational", "cinematic", "premium"],
+    example: "Imagine your [thing] looking like this. That's exactly what we built for [client]."
+  },
+  {
+    name: "Micro-Commitment Ladder",
+    principle: "Foot-in-the-door technique: small agreements build toward large ones. Asking a tiny, easy-to-agree-with question or action in the first 2 seconds primes the viewer to stay engaged and eventually take the CTA.",
+    triggers: ["curiosity"],
+    goals: ["lead generation", "inbound clients"],
+    formats: ["educational", "listicle", "hot take", "pov"],
+    tones: ["conversational", "approachable", "interactive"],
+    example: "Quick question — when's the last time you looked at your [thing]? That's the problem."
+  }
+];
+
+// ---- VIRAL FORMAT DATABASE ----
+const VIRAL_FORMATS = [
+  {
+    name: "POV (Point of View)",
+    description: "First-person perspective that puts the viewer inside a scenario. The viewer becomes the character, creating immersive emotional connection.",
+    bestFor: ["storytelling", "day in the life", "client experience", "aspirational content"],
+    goals: ["brand awareness", "inbound clients", "authority positioning"],
+    contentTypes: ["pov", "day in the life", "behind the scenes"],
+    execution: "Film from your perspective or narrate as if the viewer is the one experiencing it. Use text overlay: 'POV: you just [scenario]'. Keep under 30 seconds."
+  },
+  {
+    name: "Before/After Transformation",
+    description: "Side-by-side or sequential reveal showing dramatic change. Exploits the contrast effect — the bigger the gap, the stronger the engagement.",
+    bestFor: ["visual results", "renovations", "makeovers", "upgrades", "portfolio showcase"],
+    goals: ["inbound clients", "lead generation", "brand awareness"],
+    contentTypes: ["before/after", "transformation", "client results", "reveal"],
+    execution: "Show the 'before' for 2-3 seconds with a dramatic pause, then cut or swipe to the 'after'. Use trending audio with a beat drop. Text: 'Wait for it...'"
+  },
+  {
+    name: "Hot Take / Contrarian Opinion",
+    description: "A bold, possibly controversial stance that challenges the mainstream view. Triggers the brain's threat-detection system, forcing engagement through agreement or disagreement.",
+    bestFor: ["thought leadership", "industry commentary", "engagement farming", "authority building"],
+    goals: ["authority positioning", "brand awareness"],
+    contentTypes: ["hot take", "myth busting", "educational", "rant"],
+    execution: "Open with the hot take in text on screen. Speak directly to camera with conviction. Keep it under 45 seconds. End with a question to drive comments."
+  },
+  {
+    name: "Day in the Life",
+    description: "Authentic, behind-the-scenes look at a real workday. Builds parasocial connection and positions you as an accessible authority figure viewers feel they know personally.",
+    bestFor: ["personal branding", "service showcase", "lifestyle content", "team culture"],
+    goals: ["brand awareness", "authority positioning", "inbound clients"],
+    contentTypes: ["day in the life", "behind the scenes", "vlog"],
+    execution: "Film 5-8 clips throughout one workday. Open with morning routine, show 2-3 work highlights, end with a satisfying result. Use voiceover or trending audio."
+  },
+  {
+    name: "Listicle / Ranked List",
+    description: "Numbered tips, mistakes, or items that create a completion drive. The brain wants to see all items on the list, dramatically increasing watch time and retention.",
+    bestFor: ["educational content", "tips", "mistakes to avoid", "recommendations"],
+    goals: ["lead generation", "authority positioning", "brand awareness"],
+    contentTypes: ["listicle", "educational", "tips", "myth busting"],
+    execution: "Use text overlay with numbers counting up/down. One item per 3-5 seconds. Save the best/most surprising for last. Hook: 'X things [audience] needs to know about [topic]'."
+  },
+  {
+    name: "Storytime / Narrative Arc",
+    description: "Classic three-act storytelling structure (setup, conflict, resolution) compressed into 30-60 seconds. Narratives activate the brain's default mode network, creating deep emotional processing.",
+    bestFor: ["client stories", "personal experiences", "case studies", "origin stories"],
+    goals: ["inbound clients", "brand awareness", "authority positioning"],
+    contentTypes: ["storytime", "case study", "testimonial", "pov"],
+    execution: "Open with the conflict or tension ('A client called me panicking...'). Build to the turning point. Resolve with the outcome. Keep it real — no embellishment."
+  },
+  {
+    name: "Tutorial / How-To",
+    description: "Step-by-step instructional content that delivers immediate, tangible value. Positions you as the expert and creates a save-to-watch-later loop that boosts algorithmic distribution.",
+    bestFor: ["skill sharing", "process showcase", "educational content", "DIY"],
+    goals: ["authority positioning", "lead generation"],
+    contentTypes: ["educational", "tutorial", "how-to", "tips"],
+    execution: "State the outcome in the first 2 seconds. Show each step with clear visuals. Number each step on screen. End with the finished result and a CTA to save."
+  },
+  {
+    name: "Reveal / Big Moment",
+    description: "Building anticipation then delivering a dramatic payoff. Exploits the Zeigarnik effect — the brain is compelled to see incomplete tasks through to completion.",
+    bestFor: ["project completions", "unveilings", "results", "surprises", "final walkthrough"],
+    goals: ["brand awareness", "inbound clients"],
+    contentTypes: ["reveal", "before/after", "transformation", "behind the scenes"],
+    execution: "Tease 'something big' in the first second. Build tension with quick cuts of the process. Drop the reveal with a beat-synced transition. Slow-motion on the final shot."
+  },
+  {
+    name: "Myth Buster / Misconception Killer",
+    description: "Directly challenging a widely held belief. Cognitive dissonance from having a belief challenged is deeply uncomfortable — viewers must watch to resolve the tension.",
+    bestFor: ["industry education", "correcting misinformation", "positioning as expert", "generating debate"],
+    goals: ["authority positioning", "brand awareness", "lead generation"],
+    contentTypes: ["myth busting", "hot take", "educational"],
+    execution: "Open with the myth stated as fact. Dramatic pause or visual. Then demolish it with evidence. Use 'Wrong.' or 'Actually...' as the pattern interrupt. Keep under 40 seconds."
+  },
+  {
+    name: "Client Spotlight / Testimonial",
+    description: "Featuring a real client or their results. Third-party validation is processed with less skepticism than self-promotion, making testimonials the highest-converting content format.",
+    bestFor: ["social proof", "case studies", "client appreciation", "results showcase"],
+    goals: ["inbound clients", "lead generation"],
+    contentTypes: ["testimonial", "client results", "case study", "social proof"],
+    execution: "Let the client speak or narrate their story over footage of the work. Include specific results if available. Keep raw and authentic — overproduction kills trust."
+  },
+  {
+    name: "Cinematic B-Roll Montage",
+    description: "Visually stunning footage cut to music with minimal or no narration. Triggers aesthetic-visceral response and positions your brand as premium through production value alone.",
+    bestFor: ["portfolio showcase", "luxury positioning", "property tours", "brand elevation"],
+    goals: ["brand awareness", "authority positioning", "inbound clients"],
+    contentTypes: ["cinematic", "montage", "showcase", "behind the scenes"],
+    execution: "3-5 second shots with smooth transitions. Sync cuts to trending audio beats. Use drone, gimbal, and close-up variety. End with logo or subtle CTA text."
+  },
+  {
+    name: "Duet / Stitch Response",
+    description: "Reacting to or building upon someone else's viral content. Piggybacks on existing distribution while adding your unique expert perspective — borrowed audience at scale.",
+    bestFor: ["trend riding", "expert commentary", "engagement", "debate"],
+    goals: ["brand awareness", "authority positioning"],
+    contentTypes: ["reaction", "commentary", "hot take", "educational"],
+    execution: "Find a trending video in your niche. Add your expert take that either validates or challenges the original. Open strong: 'This is right but they missed...' or 'Let me show you why this is wrong.'"
+  }
+];
+
+// ---- HOOK & FORMAT MATCHING ENGINE ----
+function matchHookToIdea(idea) {
+  const niche = (document.getElementById('niche').value || '').toLowerCase();
+  const goal = (document.getElementById('goal').value || '').toLowerCase();
+  const trigger = (idea.emotional_trigger || '').toLowerCase();
+  const format = (idea.format || '').toLowerCase();
+  const title = (idea.title || '').toLowerCase();
+  const hook = (idea.hook || '').toLowerCase();
+
+  let bestMatch = null;
+  let bestScore = -1;
+
+  HOOK_LIBRARY.forEach(h => {
+    let score = 0;
+    // Trigger match (strongest signal)
+    if (h.triggers.some(t => trigger.includes(t))) score += 5;
+    // Goal match
+    if (h.goals.some(g => goal.includes(g))) score += 3;
+    // Format match
+    if (h.formats.some(f => format.includes(f))) score += 4;
+    // Tone match via content analysis
+    if (h.tones.some(t => {
+      if (t === 'luxury' || t === 'premium' || t === 'aspirational' || t === 'cinematic') return niche.includes('luxury') || niche.includes('real estate') || niche.includes('premium') || title.includes('luxury') || title.includes('cinematic');
+      if (t === 'provocative' || t === 'bold' || t === 'contrarian') return format.includes('hot take') || format.includes('myth') || hook.includes('stop') || hook.includes('nobody');
+      if (t === 'urgent' || t === 'warning') return trigger.includes('fomo') || trigger.includes('fear') || hook.includes('stop') || hook.includes('losing');
+      if (t === 'relatable' || t === 'personal') return format.includes('day in the life') || format.includes('storytime') || format.includes('pov');
+      if (t === 'data-driven' || t === 'analytical') return hook.includes('exact') || hook.includes('number') || hook.includes('step') || format.includes('educational');
+      if (t === 'secretive' || t === 'insider') return hook.includes('secret') || hook.includes('shouldn') || hook.includes('nobody') || hook.includes('don\'t want');
+      return false;
+    })) score += 2;
+    // Bonus for before/after + contrast
+    if (format.includes('before') && h.name === 'Emotional Contrast') score += 3;
+    // Bonus for educational + specificity
+    if ((format.includes('educational') || format.includes('how') || format.includes('tutorial')) && h.name === 'Specificity Bias') score += 3;
+    // Bonus for testimonial + social proof
+    if ((format.includes('testimonial') || format.includes('client') || format.includes('case study')) && h.name === 'Social Proof Cascade') score += 3;
+    // Bonus for day in the life + authority
+    if (format.includes('day in the life') && h.name === 'Authority Anchoring') score += 2;
+
+    if (score > bestScore) { bestScore = score; bestMatch = h; }
+  });
+
+  return bestMatch;
+}
+
+function matchViralFormatToIdea(idea) {
+  const goal = (document.getElementById('goal').value || '').toLowerCase();
+  const format = (idea.format || '').toLowerCase();
+  const trigger = (idea.emotional_trigger || '').toLowerCase();
+  const title = (idea.title || '').toLowerCase();
+
+  let bestMatch = null;
+  let bestScore = -1;
+
+  VIRAL_FORMATS.forEach(vf => {
+    let score = 0;
+    // Content type match (strongest)
+    if (vf.contentTypes.some(ct => format.includes(ct))) score += 6;
+    // Goal match
+    if (vf.goals.some(g => goal.includes(g))) score += 3;
+    // Best-for match via title/format keywords
+    if (vf.bestFor.some(bf => title.includes(bf) || format.includes(bf))) score += 2;
+    // Name match
+    if (format.includes(vf.name.split('/')[0].trim().split('(')[0].trim().toLowerCase())) score += 4;
+    // Trigger alignment
+    if (trigger.includes('aspiration') && (vf.name.includes('Cinematic') || vf.name.includes('Day in the Life') || vf.name.includes('POV'))) score += 2;
+    if (trigger.includes('social proof') && (vf.name.includes('Testimonial') || vf.name.includes('Client'))) score += 3;
+    if (trigger.includes('curiosity') && (vf.name.includes('Reveal') || vf.name.includes('Myth') || vf.name.includes('Hot Take'))) score += 2;
+    if (trigger.includes('fomo') && (vf.name.includes('Before/After') || vf.name.includes('Reveal'))) score += 2;
+
+    if (score > bestScore) { bestScore = score; bestMatch = vf; }
+  });
+
+  return bestMatch;
+}
+
+function generateHookExample(hookData, idea) {
+  const niche = document.getElementById('niche').value.trim() || 'your niche';
+  const nicheShort = niche.split('/')[0].trim().split(',')[0].trim();
+  const format = idea.format || 'content';
+  const trigger = idea.emotional_trigger || '';
+
+  // Generate a niche-specific example based on the hook framework
+  switch(hookData.name) {
+    case "Curiosity Gap":
+      return `"Nobody talks about the real reason ${nicheShort.toLowerCase()} clients ghost after the first call... here's what I found after 50+ projects"`;
+    case "Pattern Interrupt":
+      return `"Stop posting ${format.toLowerCase()} content like this. It's killing your reach in ${nicheShort.toLowerCase()}."`;
+    case "Social Proof Cascade":
+      return `"After working with 20+ ${nicheShort.toLowerCase()} clients, here's the one thing every top performer does differently"`;
+    case "Loss Aversion Trigger":
+      return `"Every day you don't fix this one ${nicheShort.toLowerCase()} mistake, you're leaving clients on the table"`;
+    case "Authority Anchoring":
+      return `"After years in ${nicheShort.toLowerCase()}, here's the strategy that changed everything for our best clients"`;
+    case "Identity Mirror":
+      return `"If you're in ${nicheShort.toLowerCase()} and still not doing this, you're already behind"`;
+    case "Scarcity & Urgency":
+      return `"The window for this ${nicheShort.toLowerCase()} strategy is closing — here's why you need to move now"`;
+    case "Emotional Contrast":
+      return `"This is what ${nicheShort.toLowerCase()} looked like before we stepped in... and 30 days after"`;
+    case "Specificity Bias":
+      return `"The exact 3-step ${nicheShort.toLowerCase()} system that generated results in under 2 weeks"`;
+    case "Forbidden Knowledge":
+      return `"I probably shouldn't show you this... but here's what ${nicheShort.toLowerCase()} insiders don't want you to know"`;
+    case "Aspirational Projection":
+      return `"Imagine your ${nicheShort.toLowerCase()} brand looking like this. That's what we built in 7 days."`;
+    case "Micro-Commitment Ladder":
+      return `"Quick — when's the last time you looked at your ${nicheShort.toLowerCase()} content strategy? That's the problem."`;
+    default:
+      return hookData.example;
+  }
+}
+
+function generateFormatWhy(formatData, idea) {
+  const niche = document.getElementById('niche').value.trim() || 'your niche';
+  const nicheShort = niche.split('/')[0].trim().split(',')[0].trim();
+  const goal = document.getElementById('goal').value || 'growth';
+  const format = idea.format || '';
+
+  return `This format matches "${escHtml(idea.title)}" because ${formatData.name} content drives ${goal} in ${nicheShort.toLowerCase()} by leveraging ${idea.emotional_trigger || 'emotional engagement'} — exactly what this ${format.toLowerCase()} idea needs.`;
+}
+
+function generateFormatExecution(formatData, idea) {
+  const niche = document.getElementById('niche').value.trim() || 'your niche';
+  const nicheShort = niche.split('/')[0].trim().split(',')[0].trim();
+  return formatData.execution.replace(/your niche/gi, nicheShort.toLowerCase()).replace(/the content/gi, `this ${(idea.format||'').toLowerCase()} piece`);
+}
+
+// Build recommendation HTML for a single idea
+function buildRecommendationHTML(idea) {
+  const hookMatch = matchHookToIdea(idea);
+  const formatMatch = matchViralFormatToIdea(idea);
+
+  let html = '';
+
+  if (hookMatch) {
+    const example = generateHookExample(hookMatch, idea);
+    html += `
+    <div class="rec-block">
+      <div class="rec-label">🧠 Recommended Hook Framework</div>
+      <div class="rec-name">${escHtml(hookMatch.name)}</div>
+      <div class="rec-principle">${escHtml(hookMatch.principle)}</div>
+      <div class="rec-example">${escHtml(example)}</div>
+    </div>`;
+  }
+
+  if (formatMatch) {
+    const why = generateFormatWhy(formatMatch, idea);
+    const exec = generateFormatExecution(formatMatch, idea);
+    html += `
+    <div class="rec-block">
+      <div class="rec-label viral-label">🔥 Recommended Viral Format</div>
+      <div class="rec-name">${escHtml(formatMatch.name)}</div>
+      <div class="rec-why">${why}</div>
+      <div class="rec-example viral-example">${escHtml(exec)}</div>
+    </div>`;
+  }
+
+  return html;
+}
+
+// ---- MODAL FUNCTIONS ----
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (id === 'hookModal') renderModalHooks(HOOK_LIBRARY);
+  if (id === 'viralModal') renderModalFormats(VIRAL_FORMATS);
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close modals on overlay click
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+
+// Close modals on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => {
+      m.classList.remove('open');
+    });
+    document.body.style.overflow = '';
+  }
+});
+
+function renderModalHooks(hooks) {
+  const body = document.getElementById('hookModalBody');
+  if (!hooks.length) { body.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">No hooks match your search.</div>'; return; }
+  body.innerHTML = hooks.map(h => `
+    <div class="modal-item">
+      <div class="modal-item-name">${escHtml(h.name)}</div>
+      <div class="modal-item-principle">${escHtml(h.principle)}</div>
+      <div class="modal-item-example">${escHtml(h.example)}</div>
+      <div class="modal-item-tags">
+        ${h.triggers.map(t => `<span class="modal-tag">${escHtml(t)}</span>`).join('')}
+        ${h.goals.slice(0,2).map(g => `<span class="modal-tag" style="background:rgba(168,85,247,0.08);color:#a855f7">${escHtml(g)}</span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function filterModalHooks() {
+  const q = document.getElementById('hookModalSearch').value.toLowerCase();
+  const filtered = q ? HOOK_LIBRARY.filter(h =>
+    h.name.toLowerCase().includes(q) ||
+    h.principle.toLowerCase().includes(q) ||
+    h.triggers.some(t => t.includes(q)) ||
+    h.goals.some(g => g.includes(q)) ||
+    h.example.toLowerCase().includes(q)
+  ) : HOOK_LIBRARY;
+  renderModalHooks(filtered);
+}
+
+function renderModalFormats(formats) {
+  const body = document.getElementById('viralModalBody');
+  if (!formats.length) { body.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">No formats match your search.</div>'; return; }
+  body.innerHTML = formats.map(f => `
+    <div class="modal-item">
+      <div class="modal-item-name">${escHtml(f.name)}</div>
+      <div class="modal-item-principle">${escHtml(f.description)}</div>
+      <div class="modal-item-example purple">${escHtml(f.execution)}</div>
+      <div class="modal-item-tags">
+        ${f.goals.slice(0,2).map(g => `<span class="modal-tag" style="background:rgba(168,85,247,0.08);color:#a855f7">${escHtml(g)}</span>`).join('')}
+        ${f.bestFor.slice(0,3).map(b => `<span class="modal-tag">${escHtml(b)}</span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function filterModalFormats() {
+  const q = document.getElementById('viralModalSearch').value.toLowerCase();
+  const filtered = q ? VIRAL_FORMATS.filter(f =>
+    f.name.toLowerCase().includes(q) ||
+    f.description.toLowerCase().includes(q) ||
+    f.goals.some(g => g.includes(q)) ||
+    f.bestFor.some(b => b.includes(q)) ||
+    f.contentTypes.some(ct => ct.includes(q))
+  ) : VIRAL_FORMATS;
+  renderModalFormats(filtered);
+}
+// ---- END HOOK & FORMAT SYSTEMS ----
 
 initPlatforms();
 initProfile();
