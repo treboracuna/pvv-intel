@@ -261,6 +261,7 @@ select option { background: var(--surface2); }
       <button class="acct-tab active" onclick="switchAccount('PVV', this)">📹 PVV</button>
       <button class="acct-tab" onclick="switchAccount('Texaswide Insurance', this)">🛡️ Texaswide Insurance</button>
       <button class="acct-tab" onclick="switchAccount('Exclusiva', this)">🏗️ Exclusiva / Alexandra's</button>
+      <button class="acct-tab" onclick="switchAccount('Personal Content', this)">🎬 Personal Content</button>
     </div>
   </div>
 </div>
@@ -575,7 +576,7 @@ function switchAccount(account, btn) {
   currentAccount = account;
   document.querySelectorAll('.acct-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const icons = { 'PVV': '📹', 'Texaswide Insurance': '🛡️', 'Exclusiva': '🏗️' };
+  const icons = { 'PVV': '📹', 'Texaswide Insurance': '🛡️', 'Exclusiva': '🏗️', 'Personal Content': '🎬' };
   document.getElementById('acctBadge').textContent = (icons[account] || '📊') + ' ' + account;
   // Clear results and reload for this account
   document.getElementById('logWrap').style.display = 'none';
